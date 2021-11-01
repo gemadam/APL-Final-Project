@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace APL_Final_Project
 {
@@ -11,6 +12,7 @@ namespace APL_Final_Project
     {
         public static void UnsharpMaskingCs()
         {
+            MessageBox.Show("This is message box displayed by UnsharpMasking function in C# version", "Hello there");
         }
 
 
