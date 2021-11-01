@@ -22,10 +22,17 @@ namespace APL_Final_Project
 
         public static void UnsharpMaskingCs(string sInputFile, string sOutputFile)
         {
+            kernel = new double[3, 3]
+            {
+                { 1d / 9, 1d / 9, 1d / 9 },
+                { 1d / 9, 1d / 9, 1d / 9 },
+                { 1d / 9, 1d / 9, 1d / 9 },
+            };
+
             var imgInput = (Bitmap)Image.FromFile(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), sInputFile));
             var imgOutput = new Bitmap(imgInput.Width, imgInput.Height);
 
-            var iMiddle = kernel.Length / 2;
+            var iMiddle = 3 / 2;
 
             for (var x = iMiddle; x < imgInput.Width - iMiddle; x++)
                 for(var y = iMiddle; y < imgInput.Height - iMiddle; y++)
@@ -38,9 +45,9 @@ namespace APL_Final_Project
                         for (var b = 0; b < 3; b++)
                         {
                             var xn = x + a - iMiddle;
-                            var yn = x + b - iMiddle;
+                            var yn = y + b - iMiddle;
 
-                            var pixel = imgInput.GetPixel(xn % imgInput.Width, yn % imgInput.Height);
+                            var pixel = imgInput.GetPixel(xn, yn);
 
                             acc[0] += pixel.R * kernel[a, b];
                             acc[1] += pixel.G * kernel[a, b];
@@ -48,9 +55,9 @@ namespace APL_Final_Project
                         }
 
                     imgOutput.SetPixel(x, y, Color.FromArgb(
-                        (int)(originalPixel.R + (originalPixel.R - acc[0]) * 2) % 255,
-                        (int)(originalPixel.G + (originalPixel.G - acc[1]) * 2) % 255,
-                        (int)(originalPixel.B + (originalPixel.B - acc[2]) * 2) % 255
+                        (int)Math.Abs(originalPixel.R + (originalPixel.R - acc[0]) * 2) % 255,
+                        (int)Math.Abs(originalPixel.G + (originalPixel.G - acc[1]) * 2) % 255,
+                        (int)Math.Abs(originalPixel.B + (originalPixel.B - acc[2]) * 2) % 255
                     ));
                 }
 
