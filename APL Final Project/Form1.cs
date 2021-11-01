@@ -40,7 +40,7 @@ namespace APL_Final_Project
 
         private void btnUnsharpMaskingCs_Click(object sender, EventArgs e)
         {
-            USM.UnsharpMaskingCs();
+            USM.UnsharpMaskingCs(txtInputFile.Text, txtOutputFile.Text);
         }
 
         private void btnUnsharpMaskingCpp_Click(object sender, EventArgs e)
