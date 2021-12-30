@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31624.102
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31919.166
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "APL Final Project", "APL Final Project\APL Final Project.csproj", "{83091187-B225-42B4-89C5-C0FC5C9E8D6B}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -35,7 +35,7 @@ Global
 		{83091187-B225-42B4-89C5-C0FC5C9E8D6B}.Release|x64.Build.0 = Release|Any CPU
 		{83091187-B225-42B4-89C5-C0FC5C9E8D6B}.Release|x86.ActiveCfg = Release|Any CPU
 		{83091187-B225-42B4-89C5-C0FC5C9E8D6B}.Release|x86.Build.0 = Release|Any CPU
-		{FE903F20-F3A7-4F65-ACE1-8D0F5B7CE05C}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{FE903F20-F3A7-4F65-ACE1-8D0F5B7CE05C}.Debug|Any CPU.ActiveCfg = Debug|Win32
 		{FE903F20-F3A7-4F65-ACE1-8D0F5B7CE05C}.Debug|x64.ActiveCfg = Debug|x64
 		{FE903F20-F3A7-4F65-ACE1-8D0F5B7CE05C}.Debug|x64.Build.0 = Debug|x64
 		{FE903F20-F3A7-4F65-ACE1-8D0F5B7CE05C}.Debug|x86.ActiveCfg = Debug|Win32
