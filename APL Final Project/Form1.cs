@@ -13,19 +13,47 @@ namespace APL_Final_Project
 {
     public partial class Form1 : Form
     {
+        private static int[,] kernel = new int[3, 3]
+        {
+            { 0, -1, 0 },
+            { -1, 5, -1 },
+            { 0, -1, 0 },
+        };
+
         public Form1()
         {
             InitializeComponent();
+
+            lbBestTimeAsm.Text = "-";
+            lbBestTimeCpp.Text = "-";
+            lbBestTimeCs.Text = "-";
+
+            cbAsmLiveReload.Checked = false;
+            cbCppLiveReload.Checked = false;
+            cbCsLiveReload.Checked = false;
+            cbSamleLiveReload.Checked = false;
+
+            numKernel1.Value = kernel[0, 0];
+            numKernel2.Value = kernel[0, 1];
+            numKernel3.Value = kernel[0, 2];
+            numKernel4.Value = kernel[1, 0];
+            numKernel5.Value = kernel[1, 1];
+            numKernel6.Value = kernel[1, 2];
+            numKernel7.Value = kernel[2, 0];
+            numKernel8.Value = kernel[2, 1];
+            numKernel9.Value = kernel[2, 2];
+
+            cbAsmLiveReload.Checked = true;
+            cbCppLiveReload.Checked = true;
+            cbCsLiveReload.Checked = true;
+            cbSamleLiveReload.Checked = true;
+
+            txtInputFile.Text = "istockphoto-1289383957-170667a.jpg";
         }
 
         private void btnOpenInputFileDialog_Click(object sender, EventArgs e)
         {
             fillTextboxWithUserInput(this.txtInputFile);
-        }
-
-        private void btnOpenOutputFileDialog_Click(object sender, EventArgs e)
-        {
-            fillTextboxWithUserInput(this.txtOutputFile);
         }
 
         private void fillTextboxWithUserInput(TextBox txtBox)
@@ -38,19 +66,93 @@ namespace APL_Final_Project
                 txtBox.Text = this.fileDialog.SafeFileName;
         }
 
-        private void btnUnsharpMaskingCs_Click(object sender, EventArgs e)
+        private async void btnUnsharpMaskingCs_Click(object sender, EventArgs e)
         {
-            USM.UnsharpMaskingCs(txtInputFile.Text, txtOutputFile.Text);
+            lbBestTimeCs.Text = "Executing...";
+
+            var result = await USM.UnsharpMaskingCs(new Bitmap(picSample.Image), kernel);
+            lbBestTimeCs.Text = result.ExecutionTimeString;
+            picCs.Image = result.Image;
         }
 
-        private void btnUnsharpMaskingCpp_Click(object sender, EventArgs e)
+        private async void btnUnsharpMaskingCpp_Click(object sender, EventArgs e)
         {
-            USM.UnsharpMaskingCpp();
+            lbBestTimeCpp.Text = "Executing...";
+
+            var result = await USM.UnsharpMaskingCpp(new Bitmap(picSample.Image), kernel);
+            lbBestTimeCpp.Text = result.ExecutionTimeString;
+            picCpp.Image = result.Image;
         }
 
-        private void btnUnsharpMaskingAsm_Click(object sender, EventArgs e)
+        private async void btnUnsharpMaskingAsm_Click(object sender, EventArgs e)
         {
-            USM.UnsharpMaskingAsm();
+            lbBestTimeAsm.Text = "Executing...";
+
+            var result = await USM.UnsharpMaskingAsm(new Bitmap(picSample.Image), kernel);
+            lbBestTimeAsm.Text = result.ExecutionTimeString;
+            picAsm.Image = result.Image;
+        }
+
+        private void liveReload(object sender, EventArgs e)
+        {
+            if(cbCsLiveReload.Checked)
+                btnUnsharpMaskingCs_Click(sender, e);
+
+            if (cbCppLiveReload.Checked)
+                btnUnsharpMaskingCpp_Click(sender, e);
+
+            if (cbAsmLiveReload.Checked)
+                btnUnsharpMaskingAsm_Click(sender, e);
+        }
+
+        private void btnLoadImage_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(txtInputFile.Text))
+            {
+                MessageBox.Show("Incorrect input file!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            picSample.Image = Image.FromFile(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), txtInputFile.Text));
+
+            liveReload(sender, e);
+        }
+
+        private void numKernel_ValueChanged(object sender, EventArgs e)
+        {
+            var numericControl = sender as NumericUpDown;
+
+            if (numericControl == null)
+                return;
+
+            if (numericControl == numKernel1)
+                kernel[0, 0] = Decimal.ToInt32(numericControl.Value);
+            else if (numericControl == numKernel2)
+                kernel[0, 1] = Decimal.ToInt32(numericControl.Value);
+            else if (numericControl == numKernel3)
+                kernel[0, 2] = Decimal.ToInt32(numericControl.Value);
+            else if (numericControl == numKernel4)
+                kernel[1, 0] = Decimal.ToInt32(numericControl.Value);
+            else if (numericControl == numKernel5)
+                kernel[1, 1] = Decimal.ToInt32(numericControl.Value);
+            else if (numericControl == numKernel6)
+                kernel[1, 2] = Decimal.ToInt32(numericControl.Value);
+            else if (numericControl == numKernel7)
+                kernel[2, 0] = Decimal.ToInt32(numericControl.Value);
+            else if (numericControl == numKernel8)
+                kernel[2, 1] = Decimal.ToInt32(numericControl.Value);
+            else if (numericControl == numKernel9)
+                kernel[2, 2] = Decimal.ToInt32(numericControl.Value);
+            else
+                return;
+
+            liveReload(sender, e);
+        }
+
+        private void txtInputFile_TextChanged(object sender, EventArgs e)
+        {
+            if(cbSamleLiveReload.Checked)
+                btnLoadImage_Click(sender, e);
         }
     }
 }
