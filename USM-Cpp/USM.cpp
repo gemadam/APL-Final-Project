@@ -19,19 +19,19 @@ struct Pixel
 
 extern "C" __declspec(dllexport) void UnsharpMaskingCpp(CppBMP &img, int kernel[3][3])
 {
-    int iMiddle = 3 / 2;
-
     int iPixelIterator = 0;
-    for (int x = iMiddle; x < img.width - iMiddle; x++)
-        for (int y = iMiddle; y < img.height - iMiddle; y++)
+
+	// USM
+	for (int y = 1; y < img.height - 1; y++)
+		for (int x = 1; x < img.width - 1; x++)
         {
             int acc[3] = { 0, 0, 0 };
 
             for (auto a = 0; a < 3; a++)
                 for (auto b = 0; b < 3; b++)
                 {
-                    auto xn = x + a - iMiddle;
-                    auto yn = y + b - iMiddle;
+                    auto xn = x + a - 1;
+                    auto yn = y + b - 1;
 
                     auto pixelR = img.data[yn * img.width + xn];
                     auto pixelG = img.data[yn * img.width + xn + 1];
@@ -145,5 +145,14 @@ extern "C" __declspec(dllexport) void UnsharpMaskingCppV2(CppBMP & img, int kern
 		img.outData[outDataIterator++] = pixel.g;
 		img.outData[outDataIterator++] = pixel.b;
 	}
+
+
+	for (int i = 0; i < img.height; i++)
+	{
+		delete[] a[i];
+		delete[] a1[i];
+	}
+	delete[] a;
+	delete[] a1;
 }
 

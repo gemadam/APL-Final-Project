@@ -45,12 +45,12 @@ namespace APL_Final_Project
             numKernel9.Value = kernel[2, 2];
 
             //cbAsmLiveReload.Checked = true;
-            //cbCppLiveReload.Checked = true;
+            cbCppLiveReload.Checked = true;
             cbCppV2LiveReload.Checked = true;
             cbCsLiveReload.Checked = true;
             cbSamleLiveReload.Checked = true;
 
-            txtInputFile.Text = "2021-10-22-07PM-59-16_cb8df913-aa0a-4bcd-999c-24b0259ef41b.jpg";
+            txtInputFile.Text = "audi.png";
         }
 
         private void btnOpenInputFileDialog_Click(object sender, EventArgs e)
