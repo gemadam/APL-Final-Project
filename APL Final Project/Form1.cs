@@ -30,6 +30,7 @@ namespace APL_Final_Project
 
             cbAsmLiveReload.Checked = false;
             cbCppLiveReload.Checked = false;
+            cbCppV2LiveReload.Checked = false;
             cbCsLiveReload.Checked = false;
             cbSamleLiveReload.Checked = false;
 
@@ -43,12 +44,13 @@ namespace APL_Final_Project
             numKernel8.Value = kernel[2, 1];
             numKernel9.Value = kernel[2, 2];
 
-            cbAsmLiveReload.Checked = true;
-            cbCppLiveReload.Checked = true;
+            //cbAsmLiveReload.Checked = true;
+            //cbCppLiveReload.Checked = true;
+            cbCppV2LiveReload.Checked = true;
             cbCsLiveReload.Checked = true;
             cbSamleLiveReload.Checked = true;
 
-            txtInputFile.Text = "istockphoto-1289383957-170667a.jpg";
+            txtInputFile.Text = "2021-10-22-07PM-59-16_cb8df913-aa0a-4bcd-999c-24b0259ef41b.jpg";
         }
 
         private void btnOpenInputFileDialog_Click(object sender, EventArgs e)
@@ -100,6 +102,9 @@ namespace APL_Final_Project
 
             if (cbCppLiveReload.Checked)
                 btnUnsharpMaskingCpp_Click(sender, e);
+
+            if (cbCppV2LiveReload.Checked)
+                btnUnsharpMaskingCppV2_Click(sender, e);
 
             if (cbAsmLiveReload.Checked)
                 btnUnsharpMaskingAsm_Click(sender, e);
@@ -153,6 +158,15 @@ namespace APL_Final_Project
         {
             if(cbSamleLiveReload.Checked)
                 btnLoadImage_Click(sender, e);
+        }
+
+        private async void btnUnsharpMaskingCppV2_Click(object sender, EventArgs e)
+        {
+            lbBestTimeCppV2.Text = "Executing...";
+
+            var result = await USM.UnsharpMaskingCppV2(new Bitmap(picSample.Image), kernel);
+            lbBestTimeCppV2.Text = result.ExecutionTimeString;
+            picCppV2.Image = result.Image;
         }
     }
 }
