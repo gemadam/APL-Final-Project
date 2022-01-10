@@ -87,17 +87,37 @@ namespace APL_Final_Project
         {
             byte[] buffer = new byte[3 * bmp.Width * bmp.Height];
 
-            for (var x = 0; x < bmp.Width; x++)
-                for (var y = 0; y < bmp.Height; y++)
+            var iBufferIterator = 0;
+            for (var y = 0; y < bmp.Height; y++)
+                for (var x = 0; x < bmp.Width; x++)
                 {
                     var pixel = bmp.GetPixel(x, y);
 
-                    buffer[x * bmp.Width + y] = pixel.R;
-                    buffer[x * bmp.Width + y + 1] = pixel.G;
-                    buffer[x * bmp.Width + y + 2] = pixel.B;
+                    buffer[iBufferIterator++] = pixel.R;
+                    buffer[iBufferIterator++] = pixel.G;
+                    buffer[iBufferIterator++] = pixel.B;
                 }
 
             return buffer;
+        }
+
+
+        private static Bitmap makeBitmapFromByteArray(byte[] array, int width, int height)
+        {
+            Bitmap bmp = new Bitmap(width, height);
+
+            var iBufferIterator = 0;
+            for (var y = 0; y < bmp.Height; y++)
+                for (var x = 0; x < bmp.Width; x++)
+                {
+                    bmp.SetPixel(x, y, Color.FromArgb(
+                        array[iBufferIterator++],
+                        array[iBufferIterator++],
+                        array[iBufferIterator++]
+                    ));
+                }
+
+            return bmp;
         }
 
         public static Task<USMResult> UnsharpMaskingCpp(Bitmap imgInput, int[,] kernel)
@@ -129,17 +149,7 @@ namespace APL_Final_Project
 
                     Marshal.Copy(myBMP.outData, buffer, 0, buffer.Length);
 
-                    for (var x = 0; x < myBMP.width; x++)
-                        for (var y = 0; y < myBMP.height; y++)
-                        {
-                            var pixel = imgInput.GetPixel(x, y);
-
-                            imgOutput.SetPixel(x, y, Color.FromArgb(
-                                buffer[x * imgInput.Width + y],
-                                buffer[x * imgInput.Width + y + 1],
-                                buffer[x * imgInput.Width + y + 2]
-                            ));
-                        }
+                    imgOutput = makeBitmapFromByteArray(buffer, imgInput.Width, imgInput.Height);
 
                 }
                 finally
@@ -197,17 +207,7 @@ namespace APL_Final_Project
 
                     Marshal.Copy(myBMP.outData, buffer, 0, buffer.Length);
 
-                    for (var x = 0; x < myBMP.width; x++)
-                        for (var y = 0; y < myBMP.height; y++)
-                        {
-                            var pixel = imgInput.GetPixel(x, y);
-
-                            imgOutput.SetPixel(x, y, Color.FromArgb(
-                                buffer[x * imgInput.Width + y],
-                                buffer[x * imgInput.Width + y + 1],
-                                buffer[x * imgInput.Width + y + 2]
-                            ));
-                        }
+                    imgOutput = makeBitmapFromByteArray(buffer, imgInput.Width, imgInput.Height);
 
                 }
                 finally
