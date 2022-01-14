@@ -13,11 +13,11 @@ namespace APL_Final_Project
 {
     public partial class Form1 : Form
     {
-        private static int[,] kernel = new int[3, 3]
+        private static int[] kernel = new int[]
         {
-            { 0, -1, 0 },
-            { -1, 5, -1 },
-            { 0, -1, 0 },
+            0, 0, 0,
+            0, 1, 0,
+            0, 0, 0
         };
 
         public Form1()
@@ -26,28 +26,25 @@ namespace APL_Final_Project
 
             lbBestTimeAsm.Text = "-";
             lbBestTimeCpp.Text = "-";
-            lbBestTimeCs.Text = "-";
 
             cbAsmLiveReload.Checked = false;
             cbCppLiveReload.Checked = false;
             cbCppV2LiveReload.Checked = false;
-            cbCsLiveReload.Checked = false;
             cbSamleLiveReload.Checked = false;
 
-            numKernel1.Value = kernel[0, 0];
-            numKernel2.Value = kernel[0, 1];
-            numKernel3.Value = kernel[0, 2];
-            numKernel4.Value = kernel[1, 0];
-            numKernel5.Value = kernel[1, 1];
-            numKernel6.Value = kernel[1, 2];
-            numKernel7.Value = kernel[2, 0];
-            numKernel8.Value = kernel[2, 1];
-            numKernel9.Value = kernel[2, 2];
+            numKernel1.Value = kernel[0];
+            numKernel2.Value = kernel[1];
+            numKernel3.Value = kernel[2];
+            numKernel4.Value = kernel[3];
+            numKernel5.Value = kernel[4];
+            numKernel6.Value = kernel[5];
+            numKernel7.Value = kernel[6];
+            numKernel8.Value = kernel[7];
+            numKernel9.Value = kernel[8];
 
-            //cbAsmLiveReload.Checked = true;
+            cbAsmLiveReload.Checked = false;
             cbCppLiveReload.Checked = true;
             cbCppV2LiveReload.Checked = true;
-            cbCsLiveReload.Checked = true;
             cbSamleLiveReload.Checked = true;
 
             txtInputFile.Text = "audi.png";
@@ -66,15 +63,6 @@ namespace APL_Final_Project
 
             if (this.fileDialog.ShowDialog() == DialogResult.OK)
                 txtBox.Text = this.fileDialog.SafeFileName;
-        }
-
-        private async void btnUnsharpMaskingCs_Click(object sender, EventArgs e)
-        {
-            lbBestTimeCs.Text = "Executing...";
-
-            var result = await USM.UnsharpMaskingCs(new Bitmap(picSample.Image), kernel);
-            lbBestTimeCs.Text = result.ExecutionTimeString;
-            picCs.Image = result.Image;
         }
 
         private async void btnUnsharpMaskingCpp_Click(object sender, EventArgs e)
@@ -97,9 +85,6 @@ namespace APL_Final_Project
 
         private void liveReload(object sender, EventArgs e)
         {
-            if(cbCsLiveReload.Checked)
-                btnUnsharpMaskingCs_Click(sender, e);
-
             if (cbCppLiveReload.Checked)
                 btnUnsharpMaskingCpp_Click(sender, e);
 
@@ -131,23 +116,23 @@ namespace APL_Final_Project
                 return;
 
             if (numericControl == numKernel1)
-                kernel[0, 0] = Decimal.ToInt32(numericControl.Value);
+                kernel[0] = Decimal.ToInt32(numericControl.Value);
             else if (numericControl == numKernel2)
-                kernel[0, 1] = Decimal.ToInt32(numericControl.Value);
+                kernel[1] = Decimal.ToInt32(numericControl.Value);
             else if (numericControl == numKernel3)
-                kernel[0, 2] = Decimal.ToInt32(numericControl.Value);
+                kernel[2] = Decimal.ToInt32(numericControl.Value);
             else if (numericControl == numKernel4)
-                kernel[1, 0] = Decimal.ToInt32(numericControl.Value);
+                kernel[3] = Decimal.ToInt32(numericControl.Value);
             else if (numericControl == numKernel5)
-                kernel[1, 1] = Decimal.ToInt32(numericControl.Value);
+                kernel[4] = Decimal.ToInt32(numericControl.Value);
             else if (numericControl == numKernel6)
-                kernel[1, 2] = Decimal.ToInt32(numericControl.Value);
+                kernel[5] = Decimal.ToInt32(numericControl.Value);
             else if (numericControl == numKernel7)
-                kernel[2, 0] = Decimal.ToInt32(numericControl.Value);
+                kernel[6] = Decimal.ToInt32(numericControl.Value);
             else if (numericControl == numKernel8)
-                kernel[2, 1] = Decimal.ToInt32(numericControl.Value);
+                kernel[7] = Decimal.ToInt32(numericControl.Value);
             else if (numericControl == numKernel9)
-                kernel[2, 2] = Decimal.ToInt32(numericControl.Value);
+                kernel[8] = Decimal.ToInt32(numericControl.Value);
             else
                 return;
 

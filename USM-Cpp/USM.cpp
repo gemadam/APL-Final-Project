@@ -3,13 +3,21 @@
 #include <Windows.h>
 #include <string>
 
+
 struct CppBMP
 {
     int width;
     int height;
 
-    unsigned char* data;
-    unsigned char* outData;
+	int* kernel;
+
+    unsigned char* inChannelR;
+    unsigned char* inChannelG;
+	unsigned char* inChannelB;
+
+	unsigned char* outChannelR;
+	unsigned char* outChannelG;
+	unsigned char* outChannelB;
 };
 
 struct Pixel
@@ -17,104 +25,140 @@ struct Pixel
 	unsigned char b, g, r;
 }pixel;
 
-extern "C" __declspec(dllexport) void UnsharpMaskingCpp(CppBMP &img, int kernel[3][3])
+extern "C" __declspec(dllexport) void UnsharpMaskingCpp(CppBMP &input)
 {
     int iPixelIterator = 0;
 
-	// USM
-	for (int y = 1; y < img.height - 1; y++)
-		for (int x = 1; x < img.width - 1; x++)
-        {
-            int acc[3] = { 0, 0, 0 };
+	// Top border
+    for (int x = 0; x < input.width; x++)
+    {
+		input.outChannelR[x] = input.inChannelR[x];
+		input.outChannelG[x] = input.inChannelG[x];
+		input.outChannelB[x] = input.inChannelB[x];
+    }
 
-            for (auto a = 0; a < 3; a++)
-                for (auto b = 0; b < 3; b++)
-                {
-                    auto xn = x + a - 1;
-                    auto yn = y + b - 1;
+	int iBufferIterator = 0;
+	for (int y = 1; y < input.height - 1; y++)
+	{
+		// Left border
+		input.outChannelR[iBufferIterator] = input.inChannelR[y * input.width];
+		input.outChannelG[iBufferIterator] = input.inChannelG[y * input.width];
+		input.outChannelB[iBufferIterator] = input.inChannelB[y * input.width];
+		++iBufferIterator;
 
-                    auto pixelR = img.data[yn * img.width + xn];
-                    auto pixelG = img.data[yn * img.width + xn + 1];
-                    auto pixelB = img.data[yn * img.width + xn + 2];
+		// Center of the image
+		for (int x = 1; x < input.width - 1; x++)
+		{
+			int originalR = input.inChannelR[y * input.width + x];
+			int originalG = input.inChannelG[y * input.width + x];
+			int originalB = input.inChannelB[y * input.width + x];
 
-                    acc[0] += pixelR * kernel[a][b];
-                    acc[1] += pixelG * kernel[a][b];
-                    acc[2] += pixelB * kernel[a][b];
-                }
+			auto acc = new int[3] { 0, 0, 0 };
 
-            img.outData[iPixelIterator] = acc[0];
-            img.outData[iPixelIterator + 1] = acc[1];
-            img.outData[iPixelIterator + 2] = acc[2];
+			// Process the neigbourhood of the pixel
+			for (auto a = 0; a < 3; a++)
+				for (auto b = 0; b < 3; b++)
+				{
+					int xn = x + a - 1;
+					int yn = y + b - 1;
 
-            iPixelIterator += 3;
-        }
+					int pixelR = input.inChannelR[yn * input.width + xn];
+					int pixelG = input.inChannelG[yn * input.width + xn];
+					int pixelB = input.inChannelB[yn * input.width + xn];
+
+					acc[0] += (pixelR * input.kernel[3 * b + a]);
+					acc[1] += (pixelG * input.kernel[3 * b + a]);
+					acc[2] += (pixelB * input.kernel[3 * b + a]);
+				}
+
+			input.outChannelR[iBufferIterator] = originalR + (originalR - acc[0]);
+			input.outChannelG[iBufferIterator] = originalG + (originalG - acc[1]);
+			input.outChannelB[iBufferIterator] = originalB + (originalB - acc[2]);
+			++iBufferIterator;
+		}
+
+
+		// Right border
+		input.outChannelR[iBufferIterator] = input.inChannelR[y * input.width + input.width - 1];
+		input.outChannelG[iBufferIterator] = input.inChannelG[y * input.width + input.width - 1];
+		input.outChannelB[iBufferIterator] = input.inChannelB[y * input.width + input.width - 1];
+		++iBufferIterator;
+	}
+
+	// Bottom border
+    for (int x = 0; x < input.width; x++)
+    {
+		input.outChannelR[x] = input.inChannelR[(input.height - 1) * input.width + x];
+		input.outChannelG[x] = input.inChannelG[(input.height - 1) * input.width + x];
+		input.outChannelB[x] = input.inChannelB[(input.height - 1) * input.width + x];
+    }
 }
 
 
-extern "C" __declspec(dllexport) void UnsharpMaskingCppV2(CppBMP & img, int kernel[3][3])
+extern "C" __declspec(dllexport) void UnsharpMaskingCppV2(CppBMP & input)
 {
 	int i, j, k, count = 0;
 
 	auto dataIterator = 0, outDataIterator = 0;
 
 
-	// Highboost filter
-	float filter[9] = { 
+	// Highboost input.kernel
+	/*float filter[9] = { 
 		-1, -1, -1,
 		-1, 8.9,-1,
 		-1, -1, -1
-	};
+	};*/
 
 
 	// Initialize a, a1 buffers
-	Pixel** a = new Pixel * [img.height];
-	Pixel** a1 = new Pixel * [img.height];
-	for (int i = 0; i < img.height; i++)
+	Pixel** a = new Pixel * [input.height];
+	Pixel** a1 = new Pixel * [input.height];
+	for (int i = 0; i < input.height; i++)
 	{
-		a[i] = new Pixel[img.width];
-		a1[i] = new Pixel[img.width];
+		a[i] = new Pixel[input.width];
+		a1[i] = new Pixel[input.width];
 
-		for (j = 0; j < img.width; j++)
+		for (j = 0; j < input.width; j++)
 		{
-			a[i][j].r = img.data[dataIterator++]; a1[i][j].r = 0;
-			a[i][j].g = img.data[dataIterator++]; a1[i][j].g = 0;
-			a[i][j].b = img.data[dataIterator++]; a1[i][j].b = 0;
+			a[i][j].r = input.inChannelR[dataIterator]; a1[i][j].r = 0;
+			a[i][j].g = input.inChannelG[dataIterator]; a1[i][j].g = 0;
+			a[i][j].b = input.inChannelB[dataIterator]; a1[i][j].b = 0;
+			++dataIterator;
 		}
 	}
 
 	count = 0;
 	// to write first line of original image to modified image file (border1)
-	for (k = 0; k < img.width; k++)
+	for (k = 0; k < input.width; k++)
 	{
-		img.outData[outDataIterator++] = a[0][k].r;
-		img.outData[outDataIterator++] = a[0][k].g;
-		img.outData[outDataIterator++] = a[0][k].b;
+		input.outChannelR[outDataIterator] = a[0][k].r;
+		input.outChannelG[outDataIterator] = a[0][k].g;
+		input.outChannelR[outDataIterator] = a[0][k].b;
+
+		++outDataIterator;
 	}
 
 
-
-
-
-	for (i = 1; i < img.height - 1; i++)
+	for (i = 1; i < input.height - 1; i++)
 	{
-		for (j = 1; j < (img.width - 1); j++)
+		for (j = 1; j < (input.width - 1); j++)
 		{
-			a1[i][j].r = (1 / 9.0) * ((int)a[i - 1][j - 1].r * filter[0] + (int)a[i][j -
-				1].r * filter[1] + (int)a[i + 1][j - 1].r * filter[2] + (int)a[i - 1][j].r * filter[3] + (int)a[i][j].r * filter[4] +
-				(int)a[i + 1][j].r * filter[5] + (int)a[i - 1][j + 1].r * filter[6] + (int)a[i][j + 1].r * filter[7] +
-				(int)a[i + 1][j + 1].r * filter[8]);
+			a1[i][j].r = (1 / 9.0) * ((int)a[i - 1][j - 1].r * input.kernel[0] + (int)a[i][j -
+				1].r * input.kernel[1] + (int)a[i + 1][j - 1].r * input.kernel[2] + (int)a[i - 1][j].r * input.kernel[3] + (int)a[i][j].r * input.kernel[4] +
+				(int)a[i + 1][j].r * input.kernel[5] + (int)a[i - 1][j + 1].r * input.kernel[6] + (int)a[i][j + 1].r * input.kernel[7] +
+				(int)a[i + 1][j + 1].r * input.kernel[8]);
 
-			//a1[i][j].g = (1/9.0)*((int)a[i-1][j-1].g*filter[0]+(int)a[i][j-1].g* filter[1] + (int)a[i + 1][j - 1].g * filter[2] + (int)a[i - 1][j].g * filter[3] + (int)a[i][j].g * filter[4] + (int)a[i + 1][j].g * filter[5] + (int)a[i - 1][j + 1].g * filter[6] + (int)a[i][j + 1].g * filter[7] + (int)a[i + 1][j + 1].g * filter[8]);
+			//a1[i][j].g = (1/9.0)*((int)a[i-1][j-1].g*input.kernel[0]+(int)a[i][j-1].g* input.kernel[1] + (int)a[i + 1][j - 1].g * input.kernel[2] + (int)a[i - 1][j].g * input.kernel[3] + (int)a[i][j].g * input.kernel[4] + (int)a[i + 1][j].g * input.kernel[5] + (int)a[i - 1][j + 1].g * input.kernel[6] + (int)a[i][j + 1].g * input.kernel[7] + (int)a[i + 1][j + 1].g * input.kernel[8]);
 			
-			//a1[i][j].b = (1/9.0)*((int)a[i-1][j-1].b*filter[0]+(int)a[i][j-1].b* filter[1] + (int)a[i + 1][j - 1].b * filter[2] + (int)a[i - 1][j].b * filter[3] + (int)a[i][j].b * filter[4] + (int)a[i + 1][j].b * filter[5] + (int)a[i - 1][j + 1].b * filter[6] + (int)a[i][j + 1].b * filter[7] + (int)a[i + 1][j + 1].b * filter[8]);
+			//a1[i][j].b = (1/9.0)*((int)a[i-1][j-1].b*input.kernel[0]+(int)a[i][j-1].b* input.kernel[1] + (int)a[i + 1][j - 1].b * input.kernel[2] + (int)a[i - 1][j].b * input.kernel[3] + (int)a[i][j].b * input.kernel[4] + (int)a[i + 1][j].b * input.kernel[5] + (int)a[i - 1][j + 1].b * input.kernel[6] + (int)a[i][j + 1].b * input.kernel[7] + (int)a[i + 1][j + 1].b * input.kernel[8]);
 			
 			a1[i][j].g = a[i][j].g;
 			a1[i][j].b = a[i][j].b;
 		}
-		for (k = 0; k < img.width; k++)
+		for (k = 0; k < input.width; k++)
 		{
 			// To write left and write border
-			if (k == 0 || k == img.width - 1)
+			if (k == 0 || k == input.width - 1)
 			{
 				pixel.r = a[i][k].r;
 				pixel.g = a[i][k].g;
@@ -128,26 +172,28 @@ extern "C" __declspec(dllexport) void UnsharpMaskingCppV2(CppBMP & img, int kern
 				pixel.b = a1[i][k].b;
 			}
 
-			img.outData[outDataIterator++] = pixel.r;
-			img.outData[outDataIterator++] = pixel.g;
-			img.outData[outDataIterator++] = pixel.b;
+			input.outChannelR[outDataIterator] = pixel.r;
+			input.outChannelG[outDataIterator] = pixel.g;
+			input.outChannelB[outDataIterator] = pixel.b;
+			++outDataIterator;
 		}
 	}
 
 	// To write bottom border
-	for (k = 0; k < img.width; k++)
+	for (k = 0; k < input.width; k++)
 	{
-		pixel.r = a[img.height - 1][k].r;
-		pixel.g = a[img.height - 1][k].g;
-		pixel.b = a[img.height - 1][k].b;
+		pixel.r = a[input.height - 1][k].r;
+		pixel.g = a[input.height - 1][k].g;
+		pixel.b = a[input.height - 1][k].b;
 
-		img.outData[outDataIterator++] = pixel.r;
-		img.outData[outDataIterator++] = pixel.g;
-		img.outData[outDataIterator++] = pixel.b;
+		input.outChannelR[outDataIterator] = pixel.r;
+		input.outChannelG[outDataIterator] = pixel.g;
+		input.outChannelB[outDataIterator] = pixel.b;
+		++outDataIterator;
 	}
 
 
-	for (int i = 0; i < img.height; i++)
+	for (int i = 0; i < input.height; i++)
 	{
 		delete[] a[i];
 		delete[] a1[i];
