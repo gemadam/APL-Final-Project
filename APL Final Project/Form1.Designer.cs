@@ -29,20 +29,16 @@ namespace APL_Final_Project
         /// </summary>
         private void InitializeComponent()
         {
-            this.btnUnsharpMaskingCs = new System.Windows.Forms.Button();
             this.lbInputFile = new System.Windows.Forms.Label();
             this.txtInputFile = new System.Windows.Forms.TextBox();
             this.btnOpenInputFileDialog = new System.Windows.Forms.Button();
             this.fileDialog = new System.Windows.Forms.OpenFileDialog();
             this.btnUnsharpMaskingCpp = new System.Windows.Forms.Button();
             this.btnUnsharpMaskingAsm = new System.Windows.Forms.Button();
-            this.lbBestTimeCs = new System.Windows.Forms.Label();
             this.lbBestTimeCpp = new System.Windows.Forms.Label();
             this.lbBestTimeAsm = new System.Windows.Forms.Label();
             this.picSample = new System.Windows.Forms.PictureBox();
             this.label1 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this.picCs = new System.Windows.Forms.PictureBox();
             this.label3 = new System.Windows.Forms.Label();
             this.picCpp = new System.Windows.Forms.PictureBox();
             this.label5 = new System.Windows.Forms.Label();
@@ -50,7 +46,6 @@ namespace APL_Final_Project
             this.btnLoadImage = new System.Windows.Forms.Button();
             this.numKernel1 = new System.Windows.Forms.NumericUpDown();
             this.label4 = new System.Windows.Forms.Label();
-            this.cbCsLiveReload = new System.Windows.Forms.CheckBox();
             this.cbAsmLiveReload = new System.Windows.Forms.CheckBox();
             this.cbCppLiveReload = new System.Windows.Forms.CheckBox();
             this.numKernel2 = new System.Windows.Forms.NumericUpDown();
@@ -68,7 +63,6 @@ namespace APL_Final_Project
             this.lbBestTimeCppV2 = new System.Windows.Forms.Label();
             this.btnUnsharpMaskingCppV2 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.picSample)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.picCs)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.picCpp)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.picAsm)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numKernel1)).BeginInit();
@@ -82,16 +76,6 @@ namespace APL_Final_Project
             ((System.ComponentModel.ISupportInitialize)(this.numKernel7)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.picCppV2)).BeginInit();
             this.SuspendLayout();
-            // 
-            // btnUnsharpMaskingCs
-            // 
-            this.btnUnsharpMaskingCs.Location = new System.Drawing.Point(817, 329);
-            this.btnUnsharpMaskingCs.Name = "btnUnsharpMaskingCs";
-            this.btnUnsharpMaskingCs.Size = new System.Drawing.Size(311, 23);
-            this.btnUnsharpMaskingCs.TabIndex = 0;
-            this.btnUnsharpMaskingCs.Text = "Unsharp Masking C#";
-            this.btnUnsharpMaskingCs.UseVisualStyleBackColor = true;
-            this.btnUnsharpMaskingCs.Click += new System.EventHandler(this.btnUnsharpMaskingCs_Click);
             // 
             // lbInputFile
             // 
@@ -126,7 +110,7 @@ namespace APL_Final_Project
             // 
             // btnUnsharpMaskingCpp
             // 
-            this.btnUnsharpMaskingCpp.Location = new System.Drawing.Point(416, 680);
+            this.btnUnsharpMaskingCpp.Location = new System.Drawing.Point(817, 329);
             this.btnUnsharpMaskingCpp.Name = "btnUnsharpMaskingCpp";
             this.btnUnsharpMaskingCpp.Size = new System.Drawing.Size(311, 23);
             this.btnUnsharpMaskingCpp.TabIndex = 7;
@@ -144,19 +128,10 @@ namespace APL_Final_Project
             this.btnUnsharpMaskingAsm.UseVisualStyleBackColor = true;
             this.btnUnsharpMaskingAsm.Click += new System.EventHandler(this.btnUnsharpMaskingAsm_Click);
             // 
-            // lbBestTimeCs
-            // 
-            this.lbBestTimeCs.AutoSize = true;
-            this.lbBestTimeCs.Location = new System.Drawing.Point(1141, 9);
-            this.lbBestTimeCs.Name = "lbBestTimeCs";
-            this.lbBestTimeCs.Size = new System.Drawing.Size(71, 13);
-            this.lbBestTimeCs.TabIndex = 9;
-            this.lbBestTimeCs.Text = "lbBestTimeCs";
-            // 
             // lbBestTimeCpp
             // 
             this.lbBestTimeCpp.AutoSize = true;
-            this.lbBestTimeCpp.Location = new System.Drawing.Point(733, 360);
+            this.lbBestTimeCpp.Location = new System.Drawing.Point(1134, 9);
             this.lbBestTimeCpp.Name = "lbBestTimeCpp";
             this.lbBestTimeCpp.Size = new System.Drawing.Size(78, 13);
             this.lbBestTimeCpp.TabIndex = 10;
@@ -189,28 +164,10 @@ namespace APL_Final_Project
             this.label1.TabIndex = 14;
             this.label1.Text = "Sample";
             // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(817, 9);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(56, 13);
-            this.label2.TabIndex = 16;
-            this.label2.Text = "C# Output";
-            // 
-            // picCs
-            // 
-            this.picCs.Location = new System.Drawing.Point(817, 25);
-            this.picCs.Name = "picCs";
-            this.picCs.Size = new System.Drawing.Size(395, 298);
-            this.picCs.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.picCs.TabIndex = 15;
-            this.picCs.TabStop = false;
-            // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(416, 360);
+            this.label3.Location = new System.Drawing.Point(817, 9);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(61, 13);
             this.label3.TabIndex = 18;
@@ -218,7 +175,7 @@ namespace APL_Final_Project
             // 
             // picCpp
             // 
-            this.picCpp.Location = new System.Drawing.Point(416, 376);
+            this.picCpp.Location = new System.Drawing.Point(817, 25);
             this.picCpp.Name = "picCpp";
             this.picCpp.Size = new System.Drawing.Size(395, 298);
             this.picCpp.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
@@ -255,6 +212,7 @@ namespace APL_Final_Project
             // 
             // numKernel1
             // 
+            this.numKernel1.DecimalPlaces = 2;
             this.numKernel1.Increment = new decimal(new int[] {
             5,
             0,
@@ -280,18 +238,6 @@ namespace APL_Final_Project
             this.label4.TabIndex = 23;
             this.label4.Text = "Kernel";
             // 
-            // cbCsLiveReload
-            // 
-            this.cbCsLiveReload.AutoSize = true;
-            this.cbCsLiveReload.Checked = true;
-            this.cbCsLiveReload.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.cbCsLiveReload.Location = new System.Drawing.Point(1134, 333);
-            this.cbCsLiveReload.Name = "cbCsLiveReload";
-            this.cbCsLiveReload.Size = new System.Drawing.Size(78, 17);
-            this.cbCsLiveReload.TabIndex = 32;
-            this.cbCsLiveReload.Text = "Live reload";
-            this.cbCsLiveReload.UseVisualStyleBackColor = true;
-            // 
             // cbAsmLiveReload
             // 
             this.cbAsmLiveReload.AutoSize = true;
@@ -309,7 +255,7 @@ namespace APL_Final_Project
             this.cbCppLiveReload.AutoSize = true;
             this.cbCppLiveReload.Checked = true;
             this.cbCppLiveReload.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.cbCppLiveReload.Location = new System.Drawing.Point(733, 684);
+            this.cbCppLiveReload.Location = new System.Drawing.Point(1134, 333);
             this.cbCppLiveReload.Name = "cbCppLiveReload";
             this.cbCppLiveReload.Size = new System.Drawing.Size(78, 17);
             this.cbCppLiveReload.TabIndex = 34;
@@ -318,6 +264,7 @@ namespace APL_Final_Project
             // 
             // numKernel2
             // 
+            this.numKernel2.DecimalPlaces = 2;
             this.numKernel2.Increment = new decimal(new int[] {
             5,
             0,
@@ -336,6 +283,7 @@ namespace APL_Final_Project
             // 
             // numKernel3
             // 
+            this.numKernel3.DecimalPlaces = 2;
             this.numKernel3.Increment = new decimal(new int[] {
             5,
             0,
@@ -354,6 +302,7 @@ namespace APL_Final_Project
             // 
             // numKernel6
             // 
+            this.numKernel6.DecimalPlaces = 2;
             this.numKernel6.Increment = new decimal(new int[] {
             5,
             0,
@@ -372,6 +321,7 @@ namespace APL_Final_Project
             // 
             // numKernel5
             // 
+            this.numKernel5.DecimalPlaces = 2;
             this.numKernel5.Increment = new decimal(new int[] {
             5,
             0,
@@ -390,6 +340,7 @@ namespace APL_Final_Project
             // 
             // numKernel4
             // 
+            this.numKernel4.DecimalPlaces = 2;
             this.numKernel4.Increment = new decimal(new int[] {
             5,
             0,
@@ -408,6 +359,7 @@ namespace APL_Final_Project
             // 
             // numKernel9
             // 
+            this.numKernel9.DecimalPlaces = 2;
             this.numKernel9.Increment = new decimal(new int[] {
             5,
             0,
@@ -426,6 +378,7 @@ namespace APL_Final_Project
             // 
             // numKernel8
             // 
+            this.numKernel8.DecimalPlaces = 2;
             this.numKernel8.Increment = new decimal(new int[] {
             5,
             0,
@@ -444,6 +397,7 @@ namespace APL_Final_Project
             // 
             // numKernel7
             // 
+            this.numKernel7.DecimalPlaces = 2;
             this.numKernel7.Increment = new decimal(new int[] {
             5,
             0,
@@ -477,7 +431,7 @@ namespace APL_Final_Project
             this.cbCppV2LiveReload.AutoSize = true;
             this.cbCppV2LiveReload.Checked = true;
             this.cbCppV2LiveReload.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.cbCppV2LiveReload.Location = new System.Drawing.Point(329, 684);
+            this.cbCppV2LiveReload.Location = new System.Drawing.Point(733, 684);
             this.cbCppV2LiveReload.Name = "cbCppV2LiveReload";
             this.cbCppV2LiveReload.Size = new System.Drawing.Size(78, 17);
             this.cbCppV2LiveReload.TabIndex = 48;
@@ -487,7 +441,7 @@ namespace APL_Final_Project
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(12, 360);
+            this.label6.Location = new System.Drawing.Point(416, 360);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(77, 13);
             this.label6.TabIndex = 47;
@@ -495,7 +449,7 @@ namespace APL_Final_Project
             // 
             // picCppV2
             // 
-            this.picCppV2.Location = new System.Drawing.Point(12, 376);
+            this.picCppV2.Location = new System.Drawing.Point(416, 376);
             this.picCppV2.Name = "picCppV2";
             this.picCppV2.Size = new System.Drawing.Size(395, 298);
             this.picCppV2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
@@ -505,7 +459,7 @@ namespace APL_Final_Project
             // lbBestTimeCppV2
             // 
             this.lbBestTimeCppV2.AutoSize = true;
-            this.lbBestTimeCppV2.Location = new System.Drawing.Point(316, 360);
+            this.lbBestTimeCppV2.Location = new System.Drawing.Point(720, 360);
             this.lbBestTimeCppV2.Name = "lbBestTimeCppV2";
             this.lbBestTimeCppV2.Size = new System.Drawing.Size(91, 13);
             this.lbBestTimeCppV2.TabIndex = 45;
@@ -513,7 +467,7 @@ namespace APL_Final_Project
             // 
             // btnUnsharpMaskingCppV2
             // 
-            this.btnUnsharpMaskingCppV2.Location = new System.Drawing.Point(12, 680);
+            this.btnUnsharpMaskingCppV2.Location = new System.Drawing.Point(416, 680);
             this.btnUnsharpMaskingCppV2.Name = "btnUnsharpMaskingCppV2";
             this.btnUnsharpMaskingCppV2.Size = new System.Drawing.Size(311, 23);
             this.btnUnsharpMaskingCppV2.TabIndex = 44;
@@ -542,7 +496,6 @@ namespace APL_Final_Project
             this.Controls.Add(this.numKernel2);
             this.Controls.Add(this.cbCppLiveReload);
             this.Controls.Add(this.cbAsmLiveReload);
-            this.Controls.Add(this.cbCsLiveReload);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.numKernel1);
             this.Controls.Add(this.btnLoadImage);
@@ -550,24 +503,19 @@ namespace APL_Final_Project
             this.Controls.Add(this.picAsm);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.picCpp);
-            this.Controls.Add(this.label2);
-            this.Controls.Add(this.picCs);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.picSample);
             this.Controls.Add(this.lbBestTimeAsm);
             this.Controls.Add(this.lbBestTimeCpp);
-            this.Controls.Add(this.lbBestTimeCs);
             this.Controls.Add(this.btnUnsharpMaskingAsm);
             this.Controls.Add(this.btnUnsharpMaskingCpp);
             this.Controls.Add(this.btnOpenInputFileDialog);
             this.Controls.Add(this.txtInputFile);
             this.Controls.Add(this.lbInputFile);
-            this.Controls.Add(this.btnUnsharpMaskingCs);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Name = "Form1";
             this.Text = "Unsharp Masking Algorithm";
             ((System.ComponentModel.ISupportInitialize)(this.picSample)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.picCs)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.picCpp)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.picAsm)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numKernel1)).EndInit();
@@ -586,21 +534,16 @@ namespace APL_Final_Project
         }
 
         #endregion
-
-        private System.Windows.Forms.Button btnUnsharpMaskingCs;
         private System.Windows.Forms.Label lbInputFile;
         private System.Windows.Forms.TextBox txtInputFile;
         private System.Windows.Forms.Button btnOpenInputFileDialog;
         private System.Windows.Forms.OpenFileDialog fileDialog;
         private System.Windows.Forms.Button btnUnsharpMaskingCpp;
         private System.Windows.Forms.Button btnUnsharpMaskingAsm;
-        private System.Windows.Forms.Label lbBestTimeCs;
         private System.Windows.Forms.Label lbBestTimeCpp;
         private System.Windows.Forms.Label lbBestTimeAsm;
         private System.Windows.Forms.PictureBox picSample;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.PictureBox picCs;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.PictureBox picCpp;
         private System.Windows.Forms.Label label5;
@@ -608,7 +551,6 @@ namespace APL_Final_Project
         private System.Windows.Forms.Button btnLoadImage;
         private System.Windows.Forms.NumericUpDown numKernel1;
         private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.CheckBox cbCsLiveReload;
         private System.Windows.Forms.CheckBox cbAsmLiveReload;
         private System.Windows.Forms.CheckBox cbCppLiveReload;
         private System.Windows.Forms.NumericUpDown numKernel2;
