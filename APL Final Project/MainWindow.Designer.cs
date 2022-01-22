@@ -1,7 +1,7 @@
 ﻿
 namespace APL_Final_Project
 {
-    partial class Form1
+    partial class MainWindow
     {
         /// <summary>
         /// Required designer variable.
@@ -475,7 +475,7 @@ namespace APL_Final_Project
             this.btnUnsharpMaskingCppV2.UseVisualStyleBackColor = true;
             this.btnUnsharpMaskingCppV2.Click += new System.EventHandler(this.btnUnsharpMaskingCppV2_Click);
             // 
-            // Form1
+            // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -513,7 +513,7 @@ namespace APL_Final_Project
             this.Controls.Add(this.txtInputFile);
             this.Controls.Add(this.lbInputFile);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
-            this.Name = "Form1";
+            this.Name = "MainWindow";
             this.Text = "Unsharp Masking Algorithm";
             ((System.ComponentModel.ISupportInitialize)(this.picSample)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.picCpp)).EndInit();

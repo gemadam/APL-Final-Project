@@ -17,105 +17,66 @@ namespace APL_Final_Project
         public Bitmap Image;
     }
 
-    public struct CppBMP
+    public unsafe struct USMFunctionInput
     {
         public int width;
         public int height;
 
-        public IntPtr kernel;
+        public int* kernel;
 
-        public IntPtr inChannelR;
-        public IntPtr inChannelG;
-        public IntPtr inChannelB;
+        public byte* inChannelR;
+        public byte* inChannelG;
+        public byte* inChannelB;
 
-        public IntPtr outChannelR;
-        public IntPtr outChannelG;
-        public IntPtr outChannelB;
+        public byte* outChannelR;
+        public byte* outChannelG;
+        public byte* outChannelB;
     }
 
     class USM
     {
-        private static float[] to10(byte[] arrIn, float minVal, float maxVal)
-        {
-            float[] arrOut = new float[arrIn.Length];
-
-            var rangeVal = maxVal - minVal;
-
-
-            for (var i = 0; i < arrIn.Length; i++)
-                arrOut[i] = (arrIn[i] - minVal) / rangeVal;
-
-            return arrOut;
-        }
-
-        private static byte[] to255(float[] arrIn)
-        {
-            byte[] arrOut = new byte[arrIn.Length];
-
-            for (var i = 0; i < arrIn.Length; i++)
-                arrOut[i] = (byte)(255 * arrIn[i]);
-
-            return arrOut;
-        }
-
-
-        private static USMResult makeTest(Bitmap imgInput, int[] kernel, Func<CppBMP, bool> fUSM)
+        private static USMResult makeTest(Bitmap imgInput, int[] kernel, Func<USMFunctionInput, USMFunctionInput> fUSM)
         {
             Stopwatch stopWatch = new Stopwatch();
 
             Bitmap imgOutput = null;
-            var functionInput = new CppBMP()
+
+            BmpUtil.splitIntoChannels(imgInput, out var arrR, out var arrG, out var arrB);
+            BmpUtil.splitIntoChannels(
+                BmpUtil.makeBlackBitmap(imgInput.Width, imgInput.Height),
+                out var arrBlackR, out var arrBlackG, out var arrBlackB
+            );
+
+            var outChannelR = new byte[imgInput.Width * imgInput.Height];
+            var outChannelG = new byte[imgInput.Width * imgInput.Height];
+            var outChannelB = new byte[imgInput.Width * imgInput.Height];
+
+            unsafe
             {
-                height = imgInput.Height,
-                width = imgInput.Width,
-                kernel = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(int)) * 9),
+                fixed (byte* pArrR = arrR, pArrG = arrG, pArrB = arrB, pOutChannelR = outChannelR, pOutChannelG = outChannelG, pOutChannelB = outChannelB)
+                    fixed (int* kernelPtr = kernel)
+                    {
+                        var functionInput = new USMFunctionInput()
+                        {
+                            height = imgInput.Height,
+                            width = imgInput.Width,
+                            inChannelR = pArrR,
+                            inChannelG = pArrG,
+                            inChannelB = pArrB,
+                            outChannelR = pOutChannelR,
+                            outChannelG = pOutChannelG,
+                            outChannelB = pOutChannelB,
+                            kernel = kernelPtr
+                        };
 
-                inChannelR = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(byte)) * (imgInput.Width * imgInput.Height)),
-                inChannelG = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(byte)) * (imgInput.Width * imgInput.Height)),
-                inChannelB = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(byte)) * (imgInput.Width * imgInput.Height)),
+                        stopWatch.Start();
 
-                outChannelR = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(byte)) * (imgInput.Width * imgInput.Height)),
-                outChannelG = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(byte)) * (imgInput.Width * imgInput.Height)),
-                outChannelB = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(byte)) * (imgInput.Width * imgInput.Height))
-            };
+                        functionInput = fUSM.Invoke(functionInput);
 
-            try
-            {
-                BmpUtil.splitIntoChannels(imgInput, out var arrR, out var arrG, out var arrB);
-                BmpUtil.splitIntoChannels(
-                    BmpUtil.makeBlackBitmap(imgInput.Width, imgInput.Height), 
-                    out var arrBlackR, out var arrBlackG, out var arrBlackB
-                );
+                        stopWatch.Stop();
 
-                Marshal.Copy(kernel, 0, functionInput.kernel, kernel.Length);
-
-                Marshal.Copy(arrR, 0, functionInput.inChannelR, arrR.Length);
-                Marshal.Copy(arrG, 0, functionInput.inChannelG, arrG.Length);
-                Marshal.Copy(arrB, 0, functionInput.inChannelB, arrB.Length);
-
-                Marshal.Copy(arrBlackR, 0, functionInput.outChannelR, arrBlackR.Length);
-                Marshal.Copy(arrBlackG, 0, functionInput.outChannelG, arrBlackG.Length);
-                Marshal.Copy(arrBlackB, 0, functionInput.outChannelB, arrBlackB.Length);
-
-
-                stopWatch.Start();
-
-                fUSM.Invoke(functionInput);
-
-                stopWatch.Stop();
-
-
-                Marshal.Copy(functionInput.outChannelR, arrR, 0, arrR.Length);
-                Marshal.Copy(functionInput.outChannelR, arrG, 0, arrR.Length);
-                Marshal.Copy(functionInput.outChannelR, arrB, 0, arrR.Length);
-
-                imgOutput = BmpUtil.mergeChannels(imgInput.Width, imgInput.Height, arrR, arrG, arrB);
-            }
-            finally
-            {
-                Marshal.FreeHGlobal(functionInput.inChannelR);
-                Marshal.FreeHGlobal(functionInput.inChannelG);
-                Marshal.FreeHGlobal(functionInput.inChannelB);
+                        imgOutput = BmpUtil.mergeChannels(imgInput.Width, imgInput.Height, outChannelR, outChannelG, outChannelB);
+                    }
             }
 
             return new USMResult()
@@ -134,17 +95,41 @@ namespace APL_Final_Project
 
         public static Task<USMResult> UnsharpMaskingCpp(Bitmap imgInput, int[] kernel)
         {
-            return Task.Run(() => makeTest(imgInput, kernel, (CppBMP input) => { usmCpp(ref input); return true; }));
+            return Task.Run(() => makeTest(imgInput, kernel, (USMFunctionInput input) => { 
+
+                unsafe
+                {
+                    usmCpp(&input);
+                }
+
+                return input;
+            }));
         }
 
         public static Task<USMResult> UnsharpMaskingCppV2(Bitmap imgInput, int[] kernel)
         {
-            return Task.Run(() => makeTest(imgInput, kernel, (CppBMP input) => { usmCppV2(ref input); return true; }));
+            return Task.Run(() => makeTest(imgInput, kernel, (USMFunctionInput input) => {
+
+                unsafe
+                {
+                    usmCppV2(&input);
+                }
+
+                return input;
+            }));
         }
 
         public static Task<USMResult> UnsharpMaskingAsm(Bitmap imgInput, int[] kernel)
         {
-            return Task.Run(() => makeTest(imgInput, kernel, (CppBMP input) => { usmAsm(ref input); return true; }));
+            return Task.Run(() => makeTest(imgInput, kernel, (USMFunctionInput input) => {
+
+                unsafe
+                {
+                    usmAsm(&input);
+                }
+
+                return input;
+            }));
         }
 
         #endregion
@@ -153,13 +138,13 @@ namespace APL_Final_Project
         #region DLL_FUNCTIONS
 
         [DllImport("USM-Cpp.dll", CallingConvention = CallingConvention.StdCall, EntryPoint = "UnsharpMaskingCpp")]
-        private static extern void usmCpp([In, Out] ref CppBMP cppBMP);
+        private static unsafe extern void usmCpp(USMFunctionInput* input);
 
         [DllImport("USM-Cpp.dll", CallingConvention = CallingConvention.StdCall, EntryPoint = "UnsharpMaskingCppV2")]
-        private static extern void usmCppV2([In, Out] ref CppBMP cppBMP);
+        private static unsafe extern void usmCppV2(USMFunctionInput* input);
 
         [DllImport("USM-Asm.dll", CallingConvention = CallingConvention.StdCall, EntryPoint = "UnsharpMasking")]
-        public static extern void usmAsm([In, Out] ref CppBMP input);
+        public static unsafe extern void usmAsm(USMFunctionInput* input);
 
         #endregion
     }

@@ -11,7 +11,7 @@ using System.Windows.Forms;
 
 namespace APL_Final_Project
 {
-    public partial class Form1 : Form
+    public partial class MainWindow : Form
     {
         private static int[] kernel = new int[]
         {
@@ -20,7 +20,7 @@ namespace APL_Final_Project
             0, 0, 0
         };
 
-        public Form1()
+        public MainWindow()
         {
             InitializeComponent();
 

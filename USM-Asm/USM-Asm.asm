@@ -23,7 +23,57 @@ UnsharpMasking  PROC        ; rcx -> inImg, rdx -> outImg, r8 -> width, r9 -> he
     xn                  WORD       0
     yn                  WORD       0
 
+    ; Input structure pointers
+    pInputStruct        QWORD       0
+    imgWidth            DWORD       0
+    imgHeight           DWORD       0
+    pKernel             DWORD       0
+    pInChannelR         DWORD       0
+    pInChannelG         DWORD       0
+    pInChannelB         DWORD       0
+    pOutChannelR        DWORD       0
+    pOutChannelG        DWORD       0
+    pOutChannelB        DWORD       0
+
 .code
+
+    ; Processing of the input structure
+    mov rax, rcx                        ; 1st argument of the function is a pointer to the input structure
+    mov [pInputStruct], rax             ; Save the pointer to the input structure
+
+    mov rbx, [rax]                      ; Obtain the address of the 1st structure member
+    mov ebx, [rax]                      ; Obtain the value under the pWidth pointer
+    mov DWORD PTR [imgWidth], ebx       ; Save the value in imgWidth variable
+
+    mov rbx, [rax + 8]                  ; Move to the 2nd element of the structure
+    mov ebx, [rax]                      ; Obtain the value under the pWidth pointer
+    mov DWORD PTR [imgHeight], ebx      ; Save the value in imgHeight variable
+
+    mov rbx, [rax + 16]                 ; Move to the 3rd element of the structure
+    mov [pKernel], ebx                  ; Save this pointer as pKernel
+
+    mov rbx, [rax + 24]                 ; Move to the 4th element of the structure
+    mov [pInChannelR], ebx              ; Save this pointer as pInChannelR
+
+    mov rbx, [rax + 32]                 ; Move to the 5th element of the structure
+    mov [pInChannelG], ebx              ; Save this pointer as pInChannelG
+
+    mov rbx, [rax + 40]                 ; Move to the 5th element of the structure
+    mov [pInChannelB], ebx              ; Save this pointer as pInChannelB
+
+    mov rbx, [rax + 48]                 ; Move to the 6th element of the structure
+    mov [pOutChannelR], ebx             ; Save this pointer as pOutChannelR
+
+    mov rbx, [rax + 56]                 ; Move to the 7th element of the structure
+    mov [pOutChannelG], ebx             ; Save this pointer as pOutChannelG
+
+    mov rbx, [rax + 64]                 ; Move to the 8th element of the structure
+    mov [pOutChannelB], ebx             ; Save this pointer as pOutChannelB
+
+
+    ret
+
+
 
     ; Organize parameters passed to function
     mov r10, rcx         ; r10 - Pointer to beginning of input array
