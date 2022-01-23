@@ -174,7 +174,7 @@ LoopCenterY_body:
 
     ; Process the center of the image
     LoopCenterX:
-        mov [iIteratorX], 0
+        mov [iIteratorX], 1
 
     LoopCenterX_body:
 
@@ -280,7 +280,7 @@ LoopCenterY_body:
         inc [iIteratorX]
         xor rax, rax
         mov eax, [imgWidth]
-        add rax, -2
+        add rax, -1
         cmp rax, [iIteratorX]
         jne LoopCenterX_body
 
