@@ -6,25 +6,28 @@ UnsharpMasking  PROC        ; rcx -> inImg, rdx -> outImg, r8 -> width, r9 -> he
     ;iMiddle             WORD       0
     ;iX                  WORD       0
     ;iY                  WORD       0
-    ;originalR           BYTE       0
-    ;originalG           BYTE       0
-    ;originalB           BYTE       0
     ;inImage             DB         0
     ;iLoop3Iterator      WORD       0
     ;iLoop4Iterator      WORD       0
     ;pixelR              BYTE       0
     ;pixelG              BYTE       0
     ;pixelB              BYTE       0
-    ;accR                BYTE       0
-    ;accG                BYTE       0
-    ;accB                BYTE       0
     ;xn                  WORD       0
     ;yn                  WORD       0
 
+    ; Local variables
+    accR                DWORD       0
+    accG                DWORD       0
+    accB                DWORD       0
+    originalR           BYTE        0
+    originalG           BYTE        0
+    originalB           BYTE        0
 
     ; Loop iteretors
     iIteratorX          QWORD       0
     iIteratorY          QWORD       0
+    iLoop1Iterator      QWORD       0
+    iLoop2Iterator      QWORD       0
 
     ; Auxiliary pointers
     iOutputIterator     QWORD       0
@@ -127,7 +130,7 @@ TopBorderLoop_body:
 
 ; Center of the image
 LoopCenterY:
-    mov [iIteratorY], 0
+    mov [iIteratorY], 1
 
 LoopCenterY_body:
     
@@ -174,6 +177,100 @@ LoopCenterY_body:
         mov [iIteratorX], 0
 
     LoopCenterX_body:
+
+        xor rax, rax
+        mov eax, [imgWidth]
+        mul [iIteratorY]
+        add rax, [iIteratorX]
+        mov rdx, rax                ; rdx stores offset of input pixel
+
+        ; Value of original channel R
+        mov rax, [pInChannelR]
+        add rax, rdx
+        xor rbx, rbx
+        mov bl, BYTE PTR [rax]
+        mov BYTE PTR [originalR], bl
+
+        ; Value of original channel G
+        mov rax, [pInChannelG]
+        add rax, rdx
+        xor rbx, rbx
+        mov bl, BYTE PTR [rax]
+        mov BYTE PTR [originalG], bl
+
+        ; Value of original channel B
+        mov rax, [pInChannelB]
+        add rax, rdx
+        xor rbx, rbx
+        mov bl, BYTE PTR [rax]
+        mov BYTE PTR [originalB], bl
+
+        mov [accR], 0       ; Initialize acc 'array'
+        mov [accG], 0
+        mov [accB], 0    
+        
+        ; Process neigbourhood of the pixel
+        Loop1:
+            mov [iLoop1Iterator], 0
+
+        Loop1_body:
+            Loop2:
+                mov [iLoop2Iterator], 0
+
+            Loop2_body:
+            
+                mov [accR], 0
+                mov [accG], 0
+                mov [accB], 0
+
+                ; Increments iterator of Loop2 and checks the Loop2 condition
+                inc [iLoop2Iterator]
+                xor rax, rax
+                mov eax, 3
+                cmp rax, [iLoop2Iterator]
+                jne Loop2_body
+
+            ; Increments iterator of Loop1 and checks the Loop1 condition
+            inc [iLoop1Iterator]
+            xor rax, rax
+            mov eax, 3
+            cmp rax, [iLoop1Iterator]
+            jne Loop1_body
+                 
+
+        ; Channel R
+        xor rax, rax
+        mov al, [originalR]
+        sub eax, DWORD PTR [accR]
+        ;add al, [originalR]        ; Compute new value of R
+
+        mov rbx, [iOutputIterator]
+        add rbx, [pOutChannelR]     ; Compute address of output pixel
+
+        mov [rbx], al              ; Move new value
+
+	    ; Channel G
+        xor rax, rax
+        mov al, [originalG]
+        sub eax, DWORD PTR [accG]
+        ;add al, [originalG]        ; Compute new value of G
+
+        mov rbx, [iOutputIterator]
+        add rbx, [pOutChannelG]     ; Compute address of output pixel
+        
+        mov [rbx], al              ; Move new value
+        
+	    ; Channel B
+        xor rax, rax
+        mov al, [originalB]
+        sub eax, DWORD PTR [accB]
+        ;add al, [originalB]        ; Compute new value of B
+
+        mov rbx, [iOutputIterator]
+        add rbx, [pOutChannelB]     ; Compute address of output pixel
+        
+        mov [rbx], al              ; Move new value
+        
     
 
         ; Moves output iterator to the next pixel

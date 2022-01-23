@@ -51,27 +51,25 @@ namespace APL_Final_Project
             var outChannelG = new byte[imgInput.Width * imgInput.Height];
             var outChannelB = new byte[imgInput.Width * imgInput.Height];
 
+            var functionInput = new USMFunctionInput();
             unsafe
             {
                 fixed (byte* pArrR = arrR, pArrG = arrG, pArrB = arrB, pOutChannelR = outChannelR, pOutChannelG = outChannelG, pOutChannelB = outChannelB)
                     fixed (int* kernelPtr = kernel)
                     {
-                        var functionInput = new USMFunctionInput()
-                        {
-                            height = imgInput.Height,
-                            width = imgInput.Width,
-                            inChannelR = pArrR,
-                            inChannelG = pArrG,
-                            inChannelB = pArrB,
-                            outChannelR = pOutChannelR,
-                            outChannelG = pOutChannelG,
-                            outChannelB = pOutChannelB,
-                            kernel = kernelPtr
-                        };
+                        functionInput.height = imgInput.Height;
+                        functionInput.width = imgInput.Width;
+                        functionInput.inChannelR = pArrR;
+                        functionInput.inChannelG = pArrG;
+                        functionInput.inChannelB = pArrB;
+                        functionInput.outChannelR = pOutChannelR;
+                        functionInput.outChannelG = pOutChannelG;
+                        functionInput.outChannelB = pOutChannelB;
+                        functionInput.kernel = kernelPtr;
 
                         stopWatch.Start();
 
-                        functionInput = fUSM.Invoke(functionInput);
+                        fUSM.Invoke(functionInput);
 
                         stopWatch.Stop();
 
