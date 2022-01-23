@@ -27,17 +27,17 @@ struct Pixel
 
 extern "C" __declspec(dllexport) void UnsharpMaskingCpp(CppBMP &input)
 {
-    int iPixelIterator = 0;
+	int iBufferIterator = 0;
 
 	// Top border
     for (int x = 0; x < input.width; x++)
     {
-		input.outChannelR[x] = input.inChannelR[x];
-		input.outChannelG[x] = input.inChannelG[x];
-		input.outChannelB[x] = input.inChannelB[x];
+		input.outChannelR[iBufferIterator] = input.inChannelR[x];
+		input.outChannelG[iBufferIterator] = input.inChannelG[x];
+		input.outChannelB[iBufferIterator] = input.inChannelB[x];
+		++iBufferIterator;
     }
 
-	int iBufferIterator = 0;
 	for (int y = 1; y < input.height - 1; y++)
 	{
 		// Left border

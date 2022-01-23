@@ -3,30 +3,31 @@ PUBLIC  UnsharpMasking
 _TEXT  SEGMENT
 UnsharpMasking  PROC        ; rcx -> inImg, rdx -> outImg, r8 -> width, r9 -> height
 .data
-    iMiddle             WORD       0
-    iX                  WORD       0
-    iY                  WORD       0
-    originalR           BYTE       0
-    originalG           BYTE       0
-    originalB           BYTE       0
-    inImage             DB         0
-    iLoop3Iterator      WORD       0
-    iLoop4Iterator      WORD       0
-    pixelR              BYTE       0
-    pixelG              BYTE       0
-    pixelB              BYTE       0
-    accR                BYTE       0
-    accG                BYTE       0
-    accB                BYTE       0
-    xn                  WORD       0
-    yn                  WORD       0
+    ;iMiddle             WORD       0
+    ;iX                  WORD       0
+    ;iY                  WORD       0
+    ;originalR           BYTE       0
+    ;originalG           BYTE       0
+    ;originalB           BYTE       0
+    ;inImage             DB         0
+    ;iLoop3Iterator      WORD       0
+    ;iLoop4Iterator      WORD       0
+    ;pixelR              BYTE       0
+    ;pixelG              BYTE       0
+    ;pixelB              BYTE       0
+    ;accR                BYTE       0
+    ;accG                BYTE       0
+    ;accB                BYTE       0
+    ;xn                  WORD       0
+    ;yn                  WORD       0
 
 
     ; Loop iteretors
-    iIteratorX          QWORD      0
-    iIteratorY          QWORD      0
+    iIteratorX          QWORD       0
+    iIteratorY          QWORD       0
 
     ; Auxiliary pointers
+    iOutputIterator     QWORD       0
 
     ; Input structure pointers
     pInputStruct        QWORD       0
@@ -41,6 +42,10 @@ UnsharpMasking  PROC        ; rcx -> inImg, rdx -> outImg, r8 -> width, r9 -> he
     pOutChannelB        QWORD       0
 
 .code
+
+    ; Initialize local variables with default values
+    mov [iOutputIterator], 0
+
 
     ; Processing of the input structure
     mov rax, rcx                        ; 1st argument of the function is a pointer to the input structure
@@ -77,9 +82,123 @@ UnsharpMasking  PROC        ; rcx -> inImg, rdx -> outImg, r8 -> width, r9 -> he
 
 
 
+; Rewrite the top border of the image to the output
+TopBorderLoop:
+    mov [iIteratorX], 0
+
+TopBorderLoop_body:
+
+    mov rcx, [iIteratorX]       ; Take R channel of input pixel
+    add rcx, [pInChannelR]
+    mov al, BYTE PTR [rcx]      ; al stores the value of R channel
+    
+    mov rcx, [iOutputIterator]
+    add rcx, [pOutChannelR]
+    mov [rcx], al               ; Write R channel to output pixel
+
+    mov rcx, [iIteratorX]       ; Take G channel of input pixel
+    add rcx, [pInChannelG]
+    mov al, BYTE PTR [rcx]
+    
+    mov rcx, [iOutputIterator]       
+    add rcx, [pOutChannelG]
+    mov [rcx], al               ; Write G channel to output pixel
+
+    mov rcx, [iIteratorX]       ; Take B channel of input pixel
+    add rcx, [pInChannelB]
+    mov al, BYTE PTR [rcx]
+    
+    mov rcx, [iOutputIterator]       
+    add rcx, [pOutChannelB]
+    mov [rcx], al               ; Write B channel to output pixel
+
+
+    ; Moves output iterator to the next pixel
+    inc [iOutputIterator]
+    
+    ; Increments iterator of TopBorderLoop and checks the TopBorderLoop condition
+    inc [iIteratorX]
+    xor rax, rax
+    mov eax, [imgWidth]
+    cmp rax, [iIteratorX]
+    jne TopBorderLoop_body
 
 
 
+; Center of the image
+LoopCenterY:
+    mov [iIteratorY], 0
+
+LoopCenterY_body:
+    
+    ; Rewrite the left border
+
+    mov rax, [iIteratorY]       ; Compute offset on input image
+    mul [imgWidth]
+    mov rdx, rax                ; rdx stores the offset on input image
+
+
+    mov rcx, rdx                ; Compute pinter to pixel R channel value
+    add rcx, [pInChannelR]
+    mov al, BYTE PTR [rcx]      ; al stores the value of R channel
+    
+    mov rcx, [iOutputIterator]  ; Compute pinter to output pixel R channel value
+    add rcx, [pOutChannelR]
+    mov [rcx], al               ; Write R channel to output pixel
+    
+
+    mov rcx, rdx                ; Compute pinter to pixel G channel value
+    add rcx, [pInChannelG]
+    mov al, BYTE PTR [rcx]      ; al stores the value of G channel
+    
+    mov rcx, [iOutputIterator]  ; Compute pinter to output pixel G channel value     
+    add rcx, [pOutChannelG]
+    mov [rcx], al               ; Write G channel to output pixel
+
+    
+    mov rcx, rdx                ; Compute pinter to pixel B channel value
+    add rcx, [pInChannelB]
+    mov al, BYTE PTR [rcx]      ; al stores the value of B channel
+    
+    mov rcx, [iOutputIterator]  ; Compute pinter to output pixel B channel value       
+    add rcx, [pOutChannelB]
+    mov [rcx], al               ; Write B channel to output pixel
+
+
+    ; Moves output iterator to the next pixel
+    inc [iOutputIterator]
+
+
+    ; Process the center of the image
+    LoopCenterX:
+        mov [iIteratorX], 0
+
+    LoopCenterX_body:
+    
+
+        ; Moves output iterator to the next pixel
+        inc [iOutputIterator]
+
+        ; Increments iterator of LoopCenterX and checks the LoopCenterX condition
+        inc [iIteratorX]
+        xor rax, rax
+        mov eax, [imgWidth]
+        add eax, -1
+        cmp rax, [iIteratorX]
+        jne LoopCenterX_body
+
+
+
+
+
+
+
+    ; Increments iterator of LoopCenterY and checks the LoopCenterY condition
+    inc [iIteratorY]
+    xor rax, rax
+    mov eax, [imgHeight]
+    cmp rax, [iIteratorY]
+    jne LoopCenterY_body
 
 
 
