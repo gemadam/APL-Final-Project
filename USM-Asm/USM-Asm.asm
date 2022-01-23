@@ -183,14 +183,50 @@ LoopCenterY_body:
         inc [iIteratorX]
         xor rax, rax
         mov eax, [imgWidth]
-        add eax, -1
+        add rax, -2
         cmp rax, [iIteratorX]
         jne LoopCenterX_body
 
 
 
 
+    ; Rewrite the right border
+    mov rax, [iIteratorY]       ; Compute offset on input image
+    mul [imgWidth]
+    add eax, [imgWidth]
+    add rax, -1
+    mov rdx, rax                ; rdx stores the offset on input image
 
+
+    mov rcx, rdx                ; Compute pinter to pixel R channel value
+    add rcx, [pInChannelR]
+    mov al, BYTE PTR [rcx]      ; al stores the value of R channel
+    
+    mov rcx, [iOutputIterator]  ; Compute pinter to output pixel R channel value
+    add rcx, [pOutChannelR]
+    mov [rcx], al               ; Write R channel to output pixel
+    
+
+    mov rcx, rdx                ; Compute pinter to pixel G channel value
+    add rcx, [pInChannelG]
+    mov al, BYTE PTR [rcx]      ; al stores the value of G channel
+    
+    mov rcx, [iOutputIterator]  ; Compute pinter to output pixel G channel value     
+    add rcx, [pOutChannelG]
+    mov [rcx], al               ; Write G channel to output pixel
+
+    
+    mov rcx, rdx                ; Compute pinter to pixel B channel value
+    add rcx, [pInChannelB]
+    mov al, BYTE PTR [rcx]      ; al stores the value of B channel
+    
+    mov rcx, [iOutputIterator]  ; Compute pinter to output pixel B channel value       
+    add rcx, [pOutChannelB]
+    mov [rcx], al               ; Write B channel to output pixel
+
+
+    ; Moves output iterator to the next pixel
+    inc [iOutputIterator]
 
 
     ; Increments iterator of LoopCenterY and checks the LoopCenterY condition
