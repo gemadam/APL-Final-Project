@@ -88,9 +88,10 @@ extern "C" __declspec(dllexport) void UnsharpMaskingCpp(CppBMP &input)
 	// Bottom border
     for (int x = 0; x < input.width; x++)
     {
-		input.outChannelR[x] = input.inChannelR[(input.height - 1) * input.width + x];
-		input.outChannelG[x] = input.inChannelG[(input.height - 1) * input.width + x];
-		input.outChannelB[x] = input.inChannelB[(input.height - 1) * input.width + x];
+		input.outChannelR[iBufferIterator] = input.inChannelR[(input.height - 1) * input.width + x];
+		input.outChannelG[iBufferIterator] = input.inChannelG[(input.height - 1) * input.width + x];
+		input.outChannelB[iBufferIterator] = input.inChannelB[(input.height - 1) * input.width + x];
+		++iBufferIterator;
     }
 }
 
