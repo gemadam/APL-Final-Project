@@ -16,9 +16,9 @@ UnsharpMasking  PROC        ; rcx -> inImg, rdx -> outImg, r8 -> width, r9 -> he
     ;yn                  WORD       0
 
     ; Local variables
-    accR                DWORD       0
-    accG                DWORD       0
-    accB                DWORD       0
+    accR                BYTE        0
+    accG                BYTE        0
+    accB                BYTE        0
     originalR           BYTE        0
     originalG           BYTE        0
     originalB           BYTE        0
@@ -230,12 +230,12 @@ LoopCenterY_body:
 
 
                 mov rax, [iIteratorY]
-                add rax, [iLoop1Iterator]
-                sub rax, -1
-                mul [imgWidth]
-                add rax, [iIteratorX]
                 add rax, [iLoop2Iterator]
-                sub rax, -1
+                sub rax, 1                 ; yn = (y + b - 1)
+                mul [imgWidth]              ; yn * imgWidth
+                add rax, [iIteratorX]       ; yn * imgWidth + x
+                add rax, [iLoop1Iterator]   ; yn * imgWidth + x + a
+                sub rax, 1                 ; yn * imgWidth + x + a - 1
                 movq mm3, rax               ; Move (yn * input.width + xn) to mm3
                 
                 paddq mm0, mm3
@@ -249,26 +249,23 @@ LoopCenterY_body:
                 mul [iLoop1Iterator]
                 add rax, rbx
                 add rax, [pKernel]
-                mov rbx, rax                ; Pointer to kernel value to the rbx
+                mov rbx, [rax]                ; Move kernel value to the rbx
 
 
                 movq rax, mm0
                 mov rax, [rax]
-                mov ecx, [rbx]
-                mul ecx
-                add [accR], eax
+                mul ebx
+                add [accR], al
                 
                 movq rax, mm1
                 mov rax, [rax]
-                mov ecx, [rbx]
-                mul ecx
-                add [accG], eax
+                mul ebx
+                add [accG], al
                 
                 movq rax, mm2
                 mov rax, [rax]
-                mov ecx, [rbx]
-                mul ecx
-                add [accB], eax
+                mul ebx
+                add [accB], al
 
                 ; Increments iterator of Loop2 and checks the Loop2 condition
                 inc [iLoop2Iterator]
@@ -288,7 +285,7 @@ LoopCenterY_body:
         ; Channel R
         xor rax, rax
         mov al, [originalR]
-        sub eax, DWORD PTR [accR]
+        sub al, BYTE PTR [accR]
         add al, [originalR]         ; Compute new value of R
 
         mov rbx, [iOutputIterator]
@@ -299,7 +296,7 @@ LoopCenterY_body:
 	    ; Channel G
         xor rax, rax
         mov al, [originalG]
-        sub eax, DWORD PTR [accG]
+        sub al, BYTE PTR [accG]
         add al, [originalG]         ; Compute new value of G
 
         mov rbx, [iOutputIterator]
@@ -310,7 +307,7 @@ LoopCenterY_body:
 	    ; Channel B
         xor rax, rax
         mov al, [originalB]
-        sub eax, DWORD PTR [accB]
+        sub al, BYTE PTR [accB]
         add al, [originalB]         ; Compute new value of B
 
         mov rbx, [iOutputIterator]
