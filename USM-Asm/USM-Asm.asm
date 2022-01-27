@@ -218,10 +218,57 @@ LoopCenterY_body:
                 mov [iLoop2Iterator], 0
 
             Loop2_body:
-            
-                mov [accR], 0
-                mov [accG], 0
-                mov [accB], 0
+
+                mov rax, [pInChannelR]
+                movq mm0, rax
+                
+                mov rax, [pInChannelG]
+                movq mm1, rax
+                
+                mov rax, [pInChannelB]
+                movq mm2, rax
+
+
+                mov rax, [iIteratorY]
+                add rax, [iLoop1Iterator]
+                sub rax, -1
+                mul [imgWidth]
+                add rax, [iIteratorX]
+                add rax, [iLoop2Iterator]
+                sub rax, -1
+                movq mm3, rax               ; Move (yn * input.width + xn) to mm3
+                
+                paddq mm0, mm3
+                paddq mm1, mm3
+                paddq mm2, mm3
+
+                mov rax, 12
+                mul [iLoop2Iterator]
+                mov rbx, rax
+                mov rax, 4
+                mul [iLoop1Iterator]
+                add rax, rbx
+                add rax, [pKernel]
+                mov rbx, rax                ; Pointer to kernel value to the rbx
+
+
+                movq rax, mm0
+                mov rax, [rax]
+                mov ecx, [rbx]
+                mul ecx
+                add [accR], eax
+                
+                movq rax, mm1
+                mov rax, [rax]
+                mov ecx, [rbx]
+                mul ecx
+                add [accG], eax
+                
+                movq rax, mm2
+                mov rax, [rax]
+                mov ecx, [rbx]
+                mul ecx
+                add [accB], eax
 
                 ; Increments iterator of Loop2 and checks the Loop2 condition
                 inc [iLoop2Iterator]
@@ -242,34 +289,34 @@ LoopCenterY_body:
         xor rax, rax
         mov al, [originalR]
         sub eax, DWORD PTR [accR]
-        ;add al, [originalR]        ; Compute new value of R
+        add al, [originalR]         ; Compute new value of R
 
         mov rbx, [iOutputIterator]
         add rbx, [pOutChannelR]     ; Compute address of output pixel
 
-        mov [rbx], al              ; Move new value
+        mov [rbx], al               ; Move new value
 
 	    ; Channel G
         xor rax, rax
         mov al, [originalG]
         sub eax, DWORD PTR [accG]
-        ;add al, [originalG]        ; Compute new value of G
+        add al, [originalG]         ; Compute new value of G
 
         mov rbx, [iOutputIterator]
         add rbx, [pOutChannelG]     ; Compute address of output pixel
         
-        mov [rbx], al              ; Move new value
+        mov [rbx], al               ; Move new value
         
 	    ; Channel B
         xor rax, rax
         mov al, [originalB]
         sub eax, DWORD PTR [accB]
-        ;add al, [originalB]        ; Compute new value of B
+        add al, [originalB]         ; Compute new value of B
 
         mov rbx, [iOutputIterator]
         add rbx, [pOutChannelB]     ; Compute address of output pixel
         
-        mov [rbx], al              ; Move new value
+        mov [rbx], al               ; Move new value
         
     
 
