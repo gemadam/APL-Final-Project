@@ -231,12 +231,12 @@ LoopCenterY_body:
 
                 mov rax, [iIteratorY]
                 add rax, [iLoop2Iterator]
-                sub rax, 1                 ; yn = (y + b - 1)
-                mul [imgWidth]              ; yn * imgWidth
-                add rax, [iIteratorX]       ; yn * imgWidth + x
-                add rax, [iLoop1Iterator]   ; yn * imgWidth + x + a
-                sub rax, 1                 ; yn * imgWidth + x + a - 1
-                movq mm3, rax               ; Move (yn * input.width + xn) to mm3
+                sub rax, 1
+                mul [imgWidth]
+                add rax, [iIteratorX]
+                add rax, [iLoop1Iterator]
+                sub rax, 1
+                movq mm3, rax
                 
                 paddq mm0, mm3
                 paddq mm1, mm3

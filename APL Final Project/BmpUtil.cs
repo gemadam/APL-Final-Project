@@ -25,22 +25,11 @@ namespace APL_Final_Project
                     arrG[iBufferIterator] = (pixel.G);
                     arrB[iBufferIterator++] = (pixel.B);
                 }
-
-            //var minVal = Math.Min(arrR1.Min(), Math.Min(arrG1.Min(), arrB1.Min()));
-            //var maxVal = Math.Max(arrR1.Max(), Math.Max(arrG1.Max(), arrB1.Max()));
-            //arrR = to10(arrR1, minVal, maxVal);
-            //arrG = to10(arrG1, minVal, maxVal);
-            //arrB = to10(arrB1, minVal, maxVal);
         }
 
         public static Bitmap mergeChannels(int w, int h, byte[] arrR, byte[] arrG, byte[] arrB)
         {
             Bitmap bmp = new Bitmap(w, h);
-
-            //var normalizedR = to255(arrR);
-            //var normalizedG = to255(arrG);
-            //var normalizedB = to255(arrB);
-
 
             var iBufferIterator = 0;
             for (var y = 0; y < bmp.Height; y++)
