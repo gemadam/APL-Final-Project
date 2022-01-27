@@ -60,7 +60,7 @@ namespace APL_Final_Project
 
             for (var y = 0; y < bmp.Height; y++)
                 for (var x = 0; x < bmp.Width; x++)
-                    bmp.SetPixel(x, y, Color.FromArgb(0, 0, 0));
+                    bmp.SetPixel(x, y, Color.FromArgb(x % 255, x % 255, x % 255));
 
             return bmp;
         }

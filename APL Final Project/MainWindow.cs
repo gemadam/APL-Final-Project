@@ -42,9 +42,9 @@ namespace APL_Final_Project
             numKernel8.Value = kernel[7];
             numKernel9.Value = kernel[8];
 
-            cbAsmLiveReload.Checked = false;
+            cbAsmLiveReload.Checked = true;
             cbCppLiveReload.Checked = true;
-            cbCppV2LiveReload.Checked = true;
+            cbCppV2LiveReload.Checked = false;
             cbSamleLiveReload.Checked = true;
 
             txtInputFile.Text = "audi.png";
