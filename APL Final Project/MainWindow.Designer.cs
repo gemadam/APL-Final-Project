@@ -62,6 +62,7 @@ namespace APL_Final_Project
             this.picCppV2 = new System.Windows.Forms.PictureBox();
             this.lbBestTimeCppV2 = new System.Windows.Forms.Label();
             this.btnUnsharpMaskingCppV2 = new System.Windows.Forms.Button();
+            this.btnPerformance = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.picSample)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.picCpp)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.picAsm)).BeginInit();
@@ -475,11 +476,22 @@ namespace APL_Final_Project
             this.btnUnsharpMaskingCppV2.UseVisualStyleBackColor = true;
             this.btnUnsharpMaskingCppV2.Click += new System.EventHandler(this.btnUnsharpMaskingCppV2_Click);
             // 
+            // btnPerformance
+            // 
+            this.btnPerformance.Location = new System.Drawing.Point(12, 602);
+            this.btnPerformance.Name = "btnPerformance";
+            this.btnPerformance.Size = new System.Drawing.Size(95, 95);
+            this.btnPerformance.TabIndex = 49;
+            this.btnPerformance.Text = "Performance";
+            this.btnPerformance.UseVisualStyleBackColor = true;
+            this.btnPerformance.Click += new System.EventHandler(this.btnPerformance_Click);
+            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1216, 709);
+            this.Controls.Add(this.btnPerformance);
             this.Controls.Add(this.cbCppV2LiveReload);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.picCppV2);
@@ -567,6 +579,7 @@ namespace APL_Final_Project
         private System.Windows.Forms.PictureBox picCppV2;
         private System.Windows.Forms.Label lbBestTimeCppV2;
         private System.Windows.Forms.Button btnUnsharpMaskingCppV2;
+        private System.Windows.Forms.Button btnPerformance;
     }
 }
 

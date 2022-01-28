@@ -1,4 +1,5 @@
-﻿using System;
+﻿using APL_Final_Project.TestWindow;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -152,6 +153,12 @@ namespace APL_Final_Project
             var result = await USM.UnsharpMaskingCppV2(new Bitmap(picSample.Image), kernel);
             lbBestTimeCppV2.Text = result.ExecutionTimeString;
             picCppV2.Image = result.Image;
+        }
+
+        private void btnPerformance_Click(object sender, EventArgs e)
+        {
+            using (PerformanceTestWindow dialog = new PerformanceTestWindow())
+                dialog.ShowDialog(this);
         }
     }
 }

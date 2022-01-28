@@ -13,6 +13,7 @@ namespace APL_Final_Project
 {
     public struct USMResult
     {
+        public TimeSpan ExecutionTime;
         public string ExecutionTimeString;
         public Bitmap Image;
     }
@@ -75,6 +76,7 @@ namespace APL_Final_Project
 
             return new USMResult()
             {
+                ExecutionTime = stopWatch.Elapsed,
                 ExecutionTimeString = String.Format(
                     "{0:00}:{1:00}:{2:00}.{3:00}",
                     stopWatch.Elapsed.Hours, stopWatch.Elapsed.Minutes,
