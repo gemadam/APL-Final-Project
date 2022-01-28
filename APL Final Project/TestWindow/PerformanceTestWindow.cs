@@ -50,6 +50,7 @@ namespace APL_Final_Project.TestWindow
             };
 
 
+            this.lstData.Items.Clear();
             foreach (var testFile in lstTestFiles.Items)
             {
                 var image = Image.FromFile(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), testFile.ToString()));
