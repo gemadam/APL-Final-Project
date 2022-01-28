@@ -5,10 +5,12 @@ using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Management;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
+using System.Runtime.InteropServices;
 
 namespace APL_Final_Project.TestWindow
 {
@@ -16,6 +18,7 @@ namespace APL_Final_Project.TestWindow
     {
         private IDictionary<int, ICollection<double>> measurementsAsm;
         private IDictionary<int, ICollection<double>> measurementsCpp;
+        private IDictionary<int, ICollection<double>> measurementsCppOptimized;
 
         public PerformanceTestWindow()
         {
@@ -23,6 +26,7 @@ namespace APL_Final_Project.TestWindow
 
             measurementsAsm = new Dictionary<int, ICollection<double>>();
             measurementsCpp = new Dictionary<int, ICollection<double>>();
+            measurementsCppOptimized = new Dictionary<int, ICollection<double>>();
 
             lstTestFiles.Items.Clear();
             lstTestFiles.Items.Add("audi.png");
@@ -43,6 +47,9 @@ namespace APL_Final_Project.TestWindow
 
         private async void btnExecuteTests_Click(object sender, EventArgs e)
         {
+            var cpu = new ManagementObjectSearcher("select * from Win32_Processor").Get().Cast<ManagementObject>().First();
+            this.chartData.Titles.Add("Performance test on " + (string)cpu["Name"]);
+
             int[] kernel = { 
                 0, 0, 0, 
                 0, 0, 1, 
@@ -57,6 +64,7 @@ namespace APL_Final_Project.TestWindow
 
                 var resultAsm = await USM.UnsharpMaskingAsm(new Bitmap(image), kernel);
                 var resultCpp = await USM.UnsharpMaskingCpp(new Bitmap(image), kernel);
+                var resultCppOptimized = await USM.UnsharpMaskingCppV2(new Bitmap(image), kernel);
 
                 if (measurementsAsm.ContainsKey(image.Width * image.Height))
                     measurementsAsm[image.Width * image.Height].Add(resultAsm.ExecutionTime.TotalMilliseconds);
@@ -68,7 +76,12 @@ namespace APL_Final_Project.TestWindow
                 else
                     measurementsCpp.Add(image.Width * image.Height, new List<double>() { resultCpp.ExecutionTime.TotalMilliseconds });
 
-                this.lstData.Items.Add($"Pixels: {image.Width}x{image.Height}={image.Width*image.Height}, Asm: {resultAsm.ExecutionTimeString}, Cpp: {resultCpp.ExecutionTimeString}");
+                if (measurementsCppOptimized.ContainsKey(image.Width * image.Height))
+                    measurementsCppOptimized[image.Width * image.Height].Add(resultCppOptimized.ExecutionTime.TotalMilliseconds);
+                else
+                    measurementsCppOptimized.Add(image.Width * image.Height, new List<double>() { resultCppOptimized.ExecutionTime.TotalMilliseconds });
+
+                this.lstData.Items.Add($"Pixels: {image.Width}x{image.Height}={image.Width*image.Height}, Asm: {resultAsm.ExecutionTimeString}, Cpp: {resultCpp.ExecutionTimeString}, Cpp optimized: {resultCppOptimized.ExecutionTimeString}");
             }
 
 
@@ -82,6 +95,11 @@ namespace APL_Final_Project.TestWindow
             seriesCpp.ChartType = SeriesChartType.Spline;
             foreach (var measurementSet in measurementsCpp.OrderBy(x => x.Key))
                 seriesCpp.Points.AddXY($"{measurementSet.Key}", measurementSet.Value.Average());
+
+            Series seriesCppOptimized = this.chartData.Series.Add("C++ Optimized");
+            seriesCppOptimized.ChartType = SeriesChartType.Spline;
+            foreach (var measurementSet in measurementsCppOptimized.OrderBy(x => x.Key))
+                seriesCppOptimized.Points.AddXY($"{measurementSet.Key}", measurementSet.Value.Average());
         }
     }
 }

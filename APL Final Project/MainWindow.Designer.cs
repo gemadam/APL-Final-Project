@@ -438,6 +438,7 @@ namespace APL_Final_Project
             this.cbCppV2LiveReload.TabIndex = 48;
             this.cbCppV2LiveReload.Text = "Live reload";
             this.cbCppV2LiveReload.UseVisualStyleBackColor = true;
+            this.cbCppV2LiveReload.Visible = false;
             // 
             // label6
             // 
@@ -447,6 +448,7 @@ namespace APL_Final_Project
             this.label6.Size = new System.Drawing.Size(77, 13);
             this.label6.TabIndex = 47;
             this.label6.Text = "C++ V2 Output";
+            this.label6.Visible = false;
             // 
             // picCppV2
             // 
@@ -456,6 +458,7 @@ namespace APL_Final_Project
             this.picCppV2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.picCppV2.TabIndex = 46;
             this.picCppV2.TabStop = false;
+            this.picCppV2.Visible = false;
             // 
             // lbBestTimeCppV2
             // 
@@ -465,6 +468,7 @@ namespace APL_Final_Project
             this.lbBestTimeCppV2.Size = new System.Drawing.Size(91, 13);
             this.lbBestTimeCppV2.TabIndex = 45;
             this.lbBestTimeCppV2.Text = "lbBestTimeCppV2";
+            this.lbBestTimeCppV2.Visible = false;
             // 
             // btnUnsharpMaskingCppV2
             // 
@@ -474,6 +478,7 @@ namespace APL_Final_Project
             this.btnUnsharpMaskingCppV2.TabIndex = 44;
             this.btnUnsharpMaskingCppV2.Text = "Unsharp Masking C++ V2";
             this.btnUnsharpMaskingCppV2.UseVisualStyleBackColor = true;
+            this.btnUnsharpMaskingCppV2.Visible = false;
             this.btnUnsharpMaskingCppV2.Click += new System.EventHandler(this.btnUnsharpMaskingCppV2_Click);
             // 
             // btnPerformance
