@@ -112,7 +112,7 @@ namespace APL_Final_Project
         [DllImport("USM-Cpp.dll", CallingConvention = CallingConvention.StdCall, EntryPoint = "UnsharpMaskingCpp")]
         private static unsafe extern void usmCpp(USMFunctionInput input);
 
-        [DllImport("USM-Cpp.dll", CallingConvention = CallingConvention.StdCall, EntryPoint = "UnsharpMaskingCppV2")]
+        [DllImport("USM-Cpp-Optimized.dll", CallingConvention = CallingConvention.StdCall, EntryPoint = "UnsharpMaskingCpp")]
         private static unsafe extern void usmCppV2(USMFunctionInput input);
 
         [DllImport("USM-Asm.dll", CallingConvention = CallingConvention.StdCall, EntryPoint = "UnsharpMasking")]
