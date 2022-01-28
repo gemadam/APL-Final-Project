@@ -1,20 +1,8 @@
 PUBLIC  UnsharpMasking
 
 _TEXT  SEGMENT
-UnsharpMasking  PROC        ; rcx -> inImg, rdx -> outImg, r8 -> width, r9 -> height
+UnsharpMasking  PROC
 .data
-    ;iMiddle             WORD       0
-    ;iX                  WORD       0
-    ;iY                  WORD       0
-    ;inImage             DB         0
-    ;iLoop3Iterator      WORD       0
-    ;iLoop4Iterator      WORD       0
-    ;pixelR              BYTE       0
-    ;pixelG              BYTE       0
-    ;pixelB              BYTE       0
-    ;xn                  WORD       0
-    ;yn                  WORD       0
-
     ; Local variables
     accR                BYTE        0
     accG                BYTE        0
@@ -59,7 +47,7 @@ UnsharpMasking  PROC        ; rcx -> inImg, rdx -> outImg, r8 -> width, r9 -> he
     mov DWORD PTR [imgWidth], ebx       ; Save the value in imgWidth variable
 
     mov rbx, [rax + 4]                  ; Move to the 2nd element of the structure
-    mov ebx, [rax]                      ; Obtain the value under the pWidth pointer
+    mov ebx, [rax]                      ; Obtain the value under the pHeight pointer
     mov DWORD PTR [imgHeight], ebx      ; Save the value in imgHeight variable
 
     mov rbx, [rax + 8]                  ; Move to the 3rd element of the structure
@@ -91,35 +79,48 @@ TopBorderLoop:
 
 TopBorderLoop_body:
 
-    mov rcx, [iIteratorX]       ; Take R channel of input pixel
-    add rcx, [pInChannelR]
-    mov al, BYTE PTR [rcx]      ; al stores the value of R channel
+    ; Move input addresses to MMX registers
+    movq mm0, pInChannelR
+    movq mm1, pInChannelG
+    movq mm2, pInChannelB
+
+    ; Apply index on these addresses
+    paddq mm0, [iIteratorX]
+    paddq mm1, [iIteratorX]
+    paddq mm2, [iIteratorX]
     
-    mov rcx, [iOutputIterator]
-    add rcx, [pOutChannelR]
-    mov [rcx], al               ; Write R channel to output pixel
-
-    mov rcx, [iIteratorX]       ; Take G channel of input pixel
-    add rcx, [pInChannelG]
-    mov al, BYTE PTR [rcx]
+    ; Move output addresses to MMX registers
+    movq mm3, pOutChannelR
+    movq mm4, pOutChannelG
+    movq mm5, pOutChannelB
     
-    mov rcx, [iOutputIterator]       
-    add rcx, [pOutChannelG]
-    mov [rcx], al               ; Write G channel to output pixel
+    ; Apply index on these addresses
+    paddq mm3, [iOutputIterator]
+    paddq mm4, [iOutputIterator]
+    paddq mm5, [iOutputIterator]
 
-    mov rcx, [iIteratorX]       ; Take B channel of input pixel
-    add rcx, [pInChannelB]
-    mov al, BYTE PTR [rcx]
+    ; Rewrite channel R
+    movq rax, mm0
+    mov rax, [rax]
+    movq rbx, mm3
+    mov [rbx], rax
     
-    mov rcx, [iOutputIterator]       
-    add rcx, [pOutChannelB]
-    mov [rcx], al               ; Write B channel to output pixel
+    ; Rewrite channel G
+    movq rax, mm1
+    mov rax, [rax]
+    movq rbx, mm4
+    mov [rbx], rax
+    
+    ; Rewrite channel B
+    movq rax, mm3
+    mov rax, [rax]
+    movq rbx, mm5
+    mov [rbx], rax
 
-
-    ; Moves output iterator to the next pixel
+    ; Move output iterator to the next pixel
     inc [iOutputIterator]
     
-    ; Increments iterator of TopBorderLoop and checks the TopBorderLoop condition
+    ; Increment iterator of TopBorderLoop and check the TopBorderLoop condition
     inc [iIteratorX]
     xor rax, rax
     mov eax, [imgWidth]
@@ -280,42 +281,46 @@ LoopCenterY_body:
             mov eax, 3
             cmp rax, [iLoop1Iterator]
             jne Loop1_body
-                 
+        
 
-        ; Channel R
-        xor rax, rax
+        ; 'Merge' channels together
         mov al, [originalR]
-        sub al, BYTE PTR [accR]
-        add al, [originalR]         ; Compute new value of R
-
-        mov rbx, [iOutputIterator]
-        add rbx, [pOutChannelR]     ; Compute address of output pixel
-
-        mov [rbx], al               ; Move new value
-
-	    ; Channel G
-        xor rax, rax
+        shl rax, 8
         mov al, [originalG]
-        sub al, BYTE PTR [accG]
-        add al, [originalG]         ; Compute new value of G
-
-        mov rbx, [iOutputIterator]
-        add rbx, [pOutChannelG]     ; Compute address of output pixel
-        
-        mov [rbx], al               ; Move new value
-        
-	    ; Channel B
-        xor rax, rax
+        shl rax, 8
         mov al, [originalB]
-        sub al, BYTE PTR [accB]
-        add al, [originalB]         ; Compute new value of B
+        movq mm0, rax               ; mm0 stores 'merged' RGB channels
+        movq mm1, rax               ; mm1 stores 'merged' RGB channels
+        
+        ; 'Merge' acc together
+        mov al, [accR]
+        shl rax, 8
+        mov al, [accG]
+        shl rax, 8
+        mov al, [accB]
+        movq mm2, rax               ; mm2 stores 'merged' acc of RGB channels
 
+        psubb mm1, mm2              ; Substract acc from original channel values
+        paddb mm0, mm1              ; Add the result to output channel values
+
+        movq rax, mm0               ; Move 'merged' result to rax
+
+        
         mov rbx, [iOutputIterator]
-        add rbx, [pOutChannelB]     ; Compute address of output pixel
+        add rbx, [pOutChannelB]     ; Compute address of output B pixel
+        mov [rbx], al               ; Save output channel B
+
+        shr rax, 8
+        mov rbx, [iOutputIterator]
+        add rbx, [pOutChannelG]     ; Compute address of output G pixel
+        mov [rbx], al               ; Save output channel G
+
+        shr rax, 8
+        mov rbx, [iOutputIterator]
+        add rbx, [pOutChannelR]     ; Compute address of output R pixel
+        mov [rbx], al               ; Save output channel R
         
-        mov [rbx], al               ; Move new value
-        
-    
+
 
         ; Moves output iterator to the next pixel
         inc [iOutputIterator]

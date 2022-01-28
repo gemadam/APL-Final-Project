@@ -42,10 +42,6 @@ namespace APL_Final_Project
             Bitmap imgOutput = null;
 
             BmpUtil.splitIntoChannels(imgInput, out var arrR, out var arrG, out var arrB);
-            BmpUtil.splitIntoChannels(
-                BmpUtil.makeBlackBitmap(imgInput.Width, imgInput.Height),
-                out var arrBlackR, out var arrBlackG, out var arrBlackB
-            );
 
             var outChannelR = new byte[imgInput.Width * imgInput.Height];
             var outChannelG = new byte[imgInput.Width * imgInput.Height];
