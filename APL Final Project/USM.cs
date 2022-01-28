@@ -35,7 +35,7 @@ namespace APL_Final_Project
 
     class USM
     {
-        private static USMResult makeTest(Bitmap imgInput, int[] kernel, Func<USMFunctionInput, USMFunctionInput> fUSM)
+        private static USMResult makeTest(Bitmap imgInput, int[] kernel, Action<USMFunctionInput> fUSM)
         {
             Stopwatch stopWatch = new Stopwatch();
 
@@ -89,41 +89,17 @@ namespace APL_Final_Project
 
         public static Task<USMResult> UnsharpMaskingCpp(Bitmap imgInput, int[] kernel)
         {
-            return Task.Run(() => makeTest(imgInput, kernel, (USMFunctionInput input) => { 
-
-                unsafe
-                {
-                    usmCpp(&input);
-                }
-
-                return input;
-            }));
+            return Task.Run(() => makeTest(imgInput, kernel, usmCpp));
         }
 
         public static Task<USMResult> UnsharpMaskingCppV2(Bitmap imgInput, int[] kernel)
         {
-            return Task.Run(() => makeTest(imgInput, kernel, (USMFunctionInput input) => {
-
-                unsafe
-                {
-                    usmCppV2(&input);
-                }
-
-                return input;
-            }));
+            return Task.Run(() => makeTest(imgInput, kernel, usmCppV2));
         }
 
         public static Task<USMResult> UnsharpMaskingAsm(Bitmap imgInput, int[] kernel)
         {
-            return Task.Run(() => makeTest(imgInput, kernel, (USMFunctionInput input) => {
-
-                unsafe
-                {
-                    usmAsm(&input);
-                }
-
-                return input;
-            }));
+            return Task.Run(() => makeTest(imgInput, kernel, usmAsm));
         }
 
         #endregion
@@ -132,13 +108,13 @@ namespace APL_Final_Project
         #region DLL_FUNCTIONS
 
         [DllImport("USM-Cpp.dll", CallingConvention = CallingConvention.StdCall, EntryPoint = "UnsharpMaskingCpp")]
-        private static unsafe extern void usmCpp(USMFunctionInput* input);
+        private static unsafe extern void usmCpp(USMFunctionInput input);
 
         [DllImport("USM-Cpp.dll", CallingConvention = CallingConvention.StdCall, EntryPoint = "UnsharpMaskingCppV2")]
-        private static unsafe extern void usmCppV2(USMFunctionInput* input);
+        private static unsafe extern void usmCppV2(USMFunctionInput input);
 
         [DllImport("USM-Asm.dll", CallingConvention = CallingConvention.StdCall, EntryPoint = "UnsharpMasking")]
-        public static unsafe extern void usmAsm(USMFunctionInput* input);
+        public static unsafe extern void usmAsm(USMFunctionInput input);
 
         #endregion
     }

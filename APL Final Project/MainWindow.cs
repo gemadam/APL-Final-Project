@@ -44,7 +44,7 @@ namespace APL_Final_Project
 
             cbAsmLiveReload.Checked = true;
             cbCppLiveReload.Checked = true;
-            cbCppV2LiveReload.Checked = false;
+            cbCppV2LiveReload.Checked = true;
             cbSamleLiveReload.Checked = true;
 
             txtInputFile.Text = "audi.png";

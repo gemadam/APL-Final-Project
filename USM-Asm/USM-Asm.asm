@@ -42,12 +42,10 @@ UnsharpMasking  PROC
     mov rax, rcx                        ; 1st argument of the function is a pointer to the input structure
     mov [pInputStruct], rax             ; Save the pointer to the input structure
 
-    mov rbx, [rax]                      ; Obtain the address of the 1st structure member
-    mov ebx, [rax]                      ; Obtain the value under the pWidth pointer
+    mov ebx, [rax]                      ; Obtain the value of the 1st structure member
     mov DWORD PTR [imgWidth], ebx       ; Save the value in imgWidth variable
 
-    mov rbx, [rax + 4]                  ; Move to the 2nd element of the structure
-    mov ebx, [rax]                      ; Obtain the value under the pHeight pointer
+    mov ebx, [rax + 4]                  ; Move to the 2nd element of the structure
     mov DWORD PTR [imgHeight], ebx      ; Save the value in imgHeight variable
 
     mov rbx, [rax + 8]                  ; Move to the 3rd element of the structure
@@ -118,7 +116,7 @@ TopBorderLoop_body:
     mov [rbx], rax
 
     ; Move output iterator to the next pixel
-    inc [iOutputIterator]
+    add [iOutputIterator], 1
     
     ; Increment iterator of TopBorderLoop and check the TopBorderLoop condition
     inc [iIteratorX]
@@ -170,7 +168,7 @@ LoopCenterY_body:
 
 
     ; Moves output iterator to the next pixel
-    inc [iOutputIterator]
+    add [iOutputIterator], 1
 
 
     ; Process the center of the image
@@ -303,27 +301,37 @@ LoopCenterY_body:
         psubb mm1, mm2              ; Substract acc from original channel values
         paddb mm0, mm1              ; Add the result to output channel values
 
-        movq rax, mm0               ; Move 'merged' result to rax
-
+        movq rcx, mm0               ; Move 'merged' result to rcx
         
-        mov rbx, [iOutputIterator]
-        add rbx, [pOutChannelB]     ; Compute address of output B pixel
-        mov [rbx], al               ; Save output channel B
 
-        shr rax, 8
-        mov rbx, [iOutputIterator]
-        add rbx, [pOutChannelG]     ; Compute address of output G pixel
-        mov [rbx], al               ; Save output channel G
+        xor rax, rax
+        mov eax, [imgWidth]
+        mul [iIteratorY]
+        add rax, [iIteratorX]
 
-        shr rax, 8
-        mov rbx, [iOutputIterator]
-        add rbx, [pOutChannelR]     ; Compute address of output R pixel
-        mov [rbx], al               ; Save output channel R
+        movq mm0, [pOutChannelB]    ; 
+        movq mm1, [pOutChannelG]    ; 
+        movq mm2, [pOutChannelR]    ;
+        movq mm3, rax
+
+        paddq mm0, mm3
+        paddq mm1, mm3
+        paddq mm2, mm3
         
+        movq rbx, mm0
+        mov [rbx], cl               ; Save output channel B
+        
+        movq rbx, mm1
+        shr rcx, 8
+        mov [rbx], cl               ; Save output channel G
+        
+        movq rbx, mm2
+        shr rcx, 8
+        mov [rbx], cl               ; Save output channel R
 
 
         ; Moves output iterator to the next pixel
-        inc [iOutputIterator]
+        add [iOutputIterator], 1
 
         ; Increments iterator of LoopCenterX and checks the LoopCenterX condition
         inc [iIteratorX]
@@ -372,7 +380,7 @@ LoopCenterY_body:
 
 
     ; Moves output iterator to the next pixel
-    inc [iOutputIterator]
+    add [iOutputIterator], 1
 
 
     ; Increments iterator of LoopCenterY and checks the LoopCenterY condition
