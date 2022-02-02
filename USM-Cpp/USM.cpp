@@ -9,15 +9,15 @@ struct CppBMP
     int width;
     int height;
 
-	int* kernel;
+	float* kernel;
 
-    unsigned char* inChannelR;
-    unsigned char* inChannelG;
-	unsigned char* inChannelB;
+    float* inChannelR;
+	float* inChannelG;
+	float* inChannelB;
 
-	unsigned char* outChannelR;
-	unsigned char* outChannelG;
-	unsigned char* outChannelB;
+	float* outChannelR;
+	float* outChannelG;
+	float* outChannelB;
 };
 
 struct Pixel
@@ -38,6 +38,12 @@ extern "C" __declspec(dllexport) void UnsharpMaskingCpp(CppBMP &input)
 		++iBufferIterator;
     }
 
+
+	int iSum = 0;
+	for (auto a = 0; a < 3; a++)
+		for (auto b = 0; b < 3; b++)
+			iSum += input.kernel[3 * b + a];
+
 	for (int y = 1; y < input.height - 1; y++)
 	{
 		// Left border
@@ -49,31 +55,28 @@ extern "C" __declspec(dllexport) void UnsharpMaskingCpp(CppBMP &input)
 		// Center of the image
 		for (int x = 1; x < input.width - 1; x++)
 		{
-			int originalR = input.inChannelR[y * input.width + x];
-			int originalG = input.inChannelG[y * input.width + x];
-			int originalB = input.inChannelB[y * input.width + x];
-
-			auto acc = new int[3] { 0, 0, 0 };
+			auto newPixelValue = new float[3] { 0, 0, 0 };
 
 			// Process the neigbourhood of the pixel
 			for (auto a = 0; a < 3; a++)
 				for (auto b = 0; b < 3; b++)
 				{
-					int xn = x + a - 1;
-					int yn = y + b - 1;
+					float kernelValue = (float)input.kernel[3 * a + b];
+					int xn = x + b - 1;
+					int yn = y + a - 1;
 
-					int pixelR = input.inChannelR[yn * input.width + xn];
-					int pixelG = input.inChannelG[yn * input.width + xn];
-					int pixelB = input.inChannelB[yn * input.width + xn];
+					auto pixelR = input.inChannelR[yn * input.width + xn];
+					auto pixelG = input.inChannelG[yn * input.width + xn];
+					auto pixelB = input.inChannelB[yn * input.width + xn];
 
-					acc[0] += (pixelR * input.kernel[3 * b + a]);
-					acc[1] += (pixelG * input.kernel[3 * b + a]);
-					acc[2] += (pixelB * input.kernel[3 * b + a]);
+					newPixelValue[0] += ((float)pixelR * kernelValue);
+					newPixelValue[1] += ((float)pixelG * kernelValue);
+					newPixelValue[2] += ((float)pixelB * kernelValue);
 				}
 
-			input.outChannelR[iBufferIterator] = originalR + (originalR - acc[0]);
-			input.outChannelG[iBufferIterator] = originalG + (originalG - acc[1]);
-			input.outChannelB[iBufferIterator] = originalB + (originalB - acc[2]);
+			input.outChannelR[iBufferIterator] = newPixelValue[0];
+			input.outChannelG[iBufferIterator] = newPixelValue[1];
+			input.outChannelB[iBufferIterator] = newPixelValue[2];
 			++iBufferIterator;
 		}
 

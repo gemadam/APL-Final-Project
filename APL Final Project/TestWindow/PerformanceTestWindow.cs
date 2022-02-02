@@ -60,28 +60,29 @@ namespace APL_Final_Project.TestWindow
             this.lstData.Items.Clear();
             foreach (var testFile in lstTestFiles.Items)
             {
-                var image = Image.FromFile(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), testFile.ToString()));
+                using (var image = Image.FromFile(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), testFile.ToString())))
+                {
+                    var resultAsm = await USM.UnsharpMaskingAsm(new Bitmap(image), kernel);
+                    var resultCpp = await USM.UnsharpMaskingCpp(new Bitmap(image), kernel);
+                    var resultCppOptimized = await USM.UnsharpMaskingCppV2(new Bitmap(image), kernel);
 
-                var resultAsm = await USM.UnsharpMaskingAsm(new Bitmap(image), kernel);
-                var resultCpp = await USM.UnsharpMaskingCpp(new Bitmap(image), kernel);
-                var resultCppOptimized = await USM.UnsharpMaskingCppV2(new Bitmap(image), kernel);
+                    if (measurementsAsm.ContainsKey(image.Width * image.Height))
+                        measurementsAsm[image.Width * image.Height].Add(resultAsm.ExecutionTime.TotalMilliseconds);
+                    else
+                        measurementsAsm.Add(image.Width * image.Height, new List<double>() { resultAsm.ExecutionTime.TotalMilliseconds });
 
-                if (measurementsAsm.ContainsKey(image.Width * image.Height))
-                    measurementsAsm[image.Width * image.Height].Add(resultAsm.ExecutionTime.TotalMilliseconds);
-                else
-                    measurementsAsm.Add(image.Width * image.Height, new List<double>() { resultAsm.ExecutionTime.TotalMilliseconds });
+                    if (measurementsCpp.ContainsKey(image.Width * image.Height))
+                        measurementsCpp[image.Width * image.Height].Add(resultAsm.ExecutionTime.TotalMilliseconds);
+                    else
+                        measurementsCpp.Add(image.Width * image.Height, new List<double>() { resultCpp.ExecutionTime.TotalMilliseconds });
 
-                if (measurementsCpp.ContainsKey(image.Width * image.Height))
-                    measurementsCpp[image.Width * image.Height].Add(resultAsm.ExecutionTime.TotalMilliseconds);
-                else
-                    measurementsCpp.Add(image.Width * image.Height, new List<double>() { resultCpp.ExecutionTime.TotalMilliseconds });
+                    if (measurementsCppOptimized.ContainsKey(image.Width * image.Height))
+                        measurementsCppOptimized[image.Width * image.Height].Add(resultCppOptimized.ExecutionTime.TotalMilliseconds);
+                    else
+                        measurementsCppOptimized.Add(image.Width * image.Height, new List<double>() { resultCppOptimized.ExecutionTime.TotalMilliseconds });
 
-                if (measurementsCppOptimized.ContainsKey(image.Width * image.Height))
-                    measurementsCppOptimized[image.Width * image.Height].Add(resultCppOptimized.ExecutionTime.TotalMilliseconds);
-                else
-                    measurementsCppOptimized.Add(image.Width * image.Height, new List<double>() { resultCppOptimized.ExecutionTime.TotalMilliseconds });
-
-                this.lstData.Items.Add($"Pixels: {image.Width}x{image.Height}={image.Width*image.Height}, Asm: {resultAsm.ExecutionTimeString}, Cpp: {resultCpp.ExecutionTimeString}, Cpp optimized: {resultCppOptimized.ExecutionTimeString}");
+                    this.lstData.Items.Add($"Pixels: {image.Width}x{image.Height}={image.Width * image.Height}, Asm: {resultAsm.ExecutionTimeString}, Cpp: {resultCpp.ExecutionTimeString}, Cpp optimized: {resultCppOptimized.ExecutionTimeString}");
+                }
             }
 
 

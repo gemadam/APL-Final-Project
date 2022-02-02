@@ -63,6 +63,10 @@ namespace APL_Final_Project
             this.lbBestTimeCppV2 = new System.Windows.Forms.Label();
             this.btnUnsharpMaskingCppV2 = new System.Windows.Forms.Button();
             this.btnPerformance = new System.Windows.Forms.Button();
+            this.btnKernel1 = new System.Windows.Forms.Button();
+            this.btnKernel2 = new System.Windows.Forms.Button();
+            this.btnKernel3 = new System.Windows.Forms.Button();
+            this.btnKernel4 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.picSample)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.picCpp)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.picAsm)).BeginInit();
@@ -491,11 +495,59 @@ namespace APL_Final_Project
             this.btnPerformance.UseVisualStyleBackColor = true;
             this.btnPerformance.Click += new System.EventHandler(this.btnPerformance_Click);
             // 
+            // btnKernel1
+            // 
+            this.btnKernel1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnKernel1.Location = new System.Drawing.Point(10, 163);
+            this.btnKernel1.Name = "btnKernel1";
+            this.btnKernel1.Size = new System.Drawing.Size(100, 100);
+            this.btnKernel1.TabIndex = 50;
+            this.btnKernel1.Text = "btnKernel1";
+            this.btnKernel1.UseVisualStyleBackColor = true;
+            this.btnKernel1.Click += new System.EventHandler(this.btnKernel1_Click);
+            // 
+            // btnKernel2
+            // 
+            this.btnKernel2.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnKernel2.Location = new System.Drawing.Point(116, 163);
+            this.btnKernel2.Name = "btnKernel2";
+            this.btnKernel2.Size = new System.Drawing.Size(97, 100);
+            this.btnKernel2.TabIndex = 51;
+            this.btnKernel2.Text = "button2";
+            this.btnKernel2.UseVisualStyleBackColor = true;
+            this.btnKernel2.Click += new System.EventHandler(this.btnKernel2_Click);
+            // 
+            // btnKernel3
+            // 
+            this.btnKernel3.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnKernel3.Location = new System.Drawing.Point(10, 269);
+            this.btnKernel3.Name = "btnKernel3";
+            this.btnKernel3.Size = new System.Drawing.Size(100, 100);
+            this.btnKernel3.TabIndex = 52;
+            this.btnKernel3.Text = "button3";
+            this.btnKernel3.UseVisualStyleBackColor = true;
+            this.btnKernel3.Click += new System.EventHandler(this.btnKernel3_Click);
+            // 
+            // btnKernel4
+            // 
+            this.btnKernel4.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnKernel4.Location = new System.Drawing.Point(116, 269);
+            this.btnKernel4.Name = "btnKernel4";
+            this.btnKernel4.Size = new System.Drawing.Size(97, 100);
+            this.btnKernel4.TabIndex = 53;
+            this.btnKernel4.Text = "button4";
+            this.btnKernel4.UseVisualStyleBackColor = true;
+            this.btnKernel4.Click += new System.EventHandler(this.btnKernel4_Click);
+            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1216, 709);
+            this.Controls.Add(this.btnKernel4);
+            this.Controls.Add(this.btnKernel3);
+            this.Controls.Add(this.btnKernel2);
+            this.Controls.Add(this.btnKernel1);
             this.Controls.Add(this.btnPerformance);
             this.Controls.Add(this.cbCppV2LiveReload);
             this.Controls.Add(this.label6);
@@ -585,6 +637,10 @@ namespace APL_Final_Project
         private System.Windows.Forms.Label lbBestTimeCppV2;
         private System.Windows.Forms.Button btnUnsharpMaskingCppV2;
         private System.Windows.Forms.Button btnPerformance;
+        private System.Windows.Forms.Button btnKernel1;
+        private System.Windows.Forms.Button btnKernel2;
+        private System.Windows.Forms.Button btnKernel3;
+        private System.Windows.Forms.Button btnKernel4;
     }
 }
 

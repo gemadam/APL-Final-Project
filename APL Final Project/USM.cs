@@ -23,15 +23,15 @@ namespace APL_Final_Project
         public int width;
         public int height;
 
-        public int* kernel;
+        public float* kernel;
 
-        public byte* inChannelR;
-        public byte* inChannelG;
-        public byte* inChannelB;
+        public float* inChannelR;
+        public float* inChannelG;
+        public float* inChannelB;
 
-        public byte* outChannelR;
-        public byte* outChannelG;
-        public byte* outChannelB;
+        public float* outChannelR;
+        public float* outChannelG;
+        public float* outChannelB;
     }
 
     class USM
@@ -44,15 +44,15 @@ namespace APL_Final_Project
 
             BmpUtil.splitIntoChannels(imgInput, out var arrR, out var arrG, out var arrB);
 
-            var outChannelR = new byte[imgInput.Width * imgInput.Height];
-            var outChannelG = new byte[imgInput.Width * imgInput.Height];
-            var outChannelB = new byte[imgInput.Width * imgInput.Height];
+            var outChannelR = new float[imgInput.Width * imgInput.Height];
+            var outChannelG = new float[imgInput.Width * imgInput.Height];
+            var outChannelB = new float[imgInput.Width * imgInput.Height];
 
             var functionInput = new USMFunctionInput();
             unsafe
             {
-                fixed (byte* pArrR = arrR, pArrG = arrG, pArrB = arrB, pOutChannelR = outChannelR, pOutChannelG = outChannelG, pOutChannelB = outChannelB)
-                    fixed (int* kernelPtr = kernel)
+                fixed (float* pArrR = arrR, pArrG = arrG, pArrB = arrB, pOutChannelR = outChannelR, pOutChannelG = outChannelG, pOutChannelB = outChannelB)
+                    fixed (float* kernelPtr = BmpUtil.Normalize(kernel, kernel.Min(), kernel.Max()))
                     {
                         functionInput.height = imgInput.Height;
                         functionInput.width = imgInput.Width;

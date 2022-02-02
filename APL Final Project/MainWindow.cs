@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -16,9 +18,9 @@ namespace APL_Final_Project
     {
         private static int[] kernel = new int[]
         {
-            0, 0, 0,
-            0, 1, 0,
-            0, 0, 0
+            0, -1, 0,
+            -1, 5, -1,
+            0, -1, 0
         };
 
         public MainWindow()
@@ -43,12 +45,28 @@ namespace APL_Final_Project
             numKernel8.Value = kernel[7];
             numKernel9.Value = kernel[8];
 
-            cbAsmLiveReload.Checked = true;
+            cbAsmLiveReload.Checked = false;
             cbCppLiveReload.Checked = true;
-            cbCppV2LiveReload.Checked = true;
+            cbCppV2LiveReload.Checked = false;
             cbSamleLiveReload.Checked = true;
 
-            txtInputFile.Text = "audi.png";
+            txtInputFile.Text = "Test2.bmp";
+
+            btnKernel1.Text  = " 0  0  0" + Environment.NewLine;
+            btnKernel1.Text += " 0  1  0" + Environment.NewLine;
+            btnKernel1.Text += " 0  0  0" + Environment.NewLine;
+
+            btnKernel2.Text  = " 0 -1  0" + Environment.NewLine;
+            btnKernel2.Text += "-1  5 -1" + Environment.NewLine;
+            btnKernel2.Text += " 0 -1  0" + Environment.NewLine;
+
+            btnKernel3.Text  = " 0  1  0" + Environment.NewLine;
+            btnKernel3.Text += " 1  5  1" + Environment.NewLine;
+            btnKernel3.Text += " 0  1  0" + Environment.NewLine;
+
+            btnKernel4.Text  = "-2 -1  0" + Environment.NewLine;
+            btnKernel4.Text += "-1  5  1" + Environment.NewLine;
+            btnKernel4.Text += " 0  1  2" + Environment.NewLine;
         }
 
         private void btnOpenInputFileDialog_Click(object sender, EventArgs e)
@@ -70,18 +88,25 @@ namespace APL_Final_Project
         {
             lbBestTimeCpp.Text = "Executing...";
 
-            var result = await USM.UnsharpMaskingCpp(new Bitmap(picSample.Image), kernel);
+            var img = Image.FromFile(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), txtInputFile.Text));
+            var result = await USM.UnsharpMaskingCpp(new Bitmap(img), kernel);
+            result.Image.Save(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), "Output-cpp.bmp"));
             lbBestTimeCpp.Text = result.ExecutionTimeString;
-            picCpp.Image = result.Image;
+
+
+            picCpp.Image = ResizeImage((Bitmap)result.Image, picCpp.Width, picCpp.Height);
         }
 
         private async void btnUnsharpMaskingAsm_Click(object sender, EventArgs e)
         {
             lbBestTimeAsm.Text = "Executing...";
 
-            var result = await USM.UnsharpMaskingAsm(new Bitmap(picSample.Image), kernel);
+            var img = Image.FromFile(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), txtInputFile.Text));
+            var result = await USM.UnsharpMaskingAsm(new Bitmap(img), kernel);
+            result.Image.Save(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), "Output-asm.bmp"));
             lbBestTimeAsm.Text = result.ExecutionTimeString;
-            picAsm.Image = result.Image;
+
+            picAsm.Image = ResizeImage((Bitmap)result.Image, picAsm.Width, picAsm.Height);
         }
 
         private void liveReload(object sender, EventArgs e)
@@ -96,6 +121,26 @@ namespace APL_Final_Project
                 btnUnsharpMaskingAsm_Click(sender, e);
         }
 
+        private Bitmap ResizeImage(Bitmap inImage, int newWidth, int newHeight)
+        {
+            Size sz = inImage.Size;
+            Bitmap zoomed = new Bitmap(newWidth, newHeight);
+            if (zoomed != null) zoomed.Dispose();
+
+            float zoom = (float)(Math.Min(newWidth / inImage.Width, newHeight / inImage.Height) / 4f + 1);
+            zoomed = new Bitmap((int)(sz.Width * zoom), (int)(sz.Height * zoom));
+
+            using (Graphics g = Graphics.FromImage(zoomed))
+            {
+                g.InterpolationMode = InterpolationMode.NearestNeighbor;
+                g.PixelOffsetMode = PixelOffsetMode.Half;
+
+                g.DrawImage(inImage, new Rectangle(Point.Empty, zoomed.Size));
+            }
+
+            return zoomed;
+        }
+
         private void btnLoadImage_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrWhiteSpace(txtInputFile.Text))
@@ -104,7 +149,9 @@ namespace APL_Final_Project
                 return;
             }
 
-            picSample.Image = Image.FromFile(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), txtInputFile.Text));
+            var img = Image.FromFile(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), txtInputFile.Text));
+           
+            picSample.Image = ResizeImage((Bitmap)img, picSample.Width, picSample.Height);
 
             liveReload(sender, e);
         }
@@ -150,15 +197,69 @@ namespace APL_Final_Project
         {
             lbBestTimeCppV2.Text = "Executing...";
 
-            var result = await USM.UnsharpMaskingCppV2(new Bitmap(picSample.Image), kernel);
+            var img = Image.FromFile(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), txtInputFile.Text));
+            var result = await USM.UnsharpMaskingCppV2(new Bitmap(img), kernel);
             lbBestTimeCppV2.Text = result.ExecutionTimeString;
-            picCppV2.Image = result.Image;
+            picCppV2.Image = ResizeImage((Bitmap)result.Image, picCppV2.Width, picCppV2.Height);
         }
 
         private void btnPerformance_Click(object sender, EventArgs e)
         {
             using (PerformanceTestWindow dialog = new PerformanceTestWindow())
                 dialog.ShowDialog(this);
+        }
+
+        private void btnKernel1_Click(object sender, EventArgs e)
+        {
+
+            numKernel1.Value = 0;
+            numKernel2.Value = 0;
+            numKernel3.Value = 0;
+            numKernel4.Value = 0;
+            numKernel5.Value = 1;
+            numKernel6.Value = 0;
+            numKernel7.Value = 0;
+            numKernel8.Value = 0;
+            numKernel9.Value = 0;
+        }
+
+        private void btnKernel2_Click(object sender, EventArgs e)
+        {
+            numKernel1.Value = 0;
+            numKernel2.Value = -1;
+            numKernel3.Value = 0;
+            numKernel4.Value = -1;
+            numKernel5.Value = 5;
+            numKernel6.Value = -1;
+            numKernel7.Value = 0;
+            numKernel8.Value = -1;
+            numKernel9.Value = 0;
+        }
+
+        private void btnKernel3_Click(object sender, EventArgs e)
+        {
+            numKernel1.Value = 0;
+            numKernel2.Value = 1;
+            numKernel3.Value = 0;
+            numKernel4.Value = 1;
+            numKernel5.Value = 5;
+            numKernel6.Value = 1;
+            numKernel7.Value = 0;
+            numKernel8.Value = 1;
+            numKernel9.Value = 0;
+        }
+
+        private void btnKernel4_Click(object sender, EventArgs e)
+        {
+            numKernel1.Value = -2;
+            numKernel2.Value = -1;
+            numKernel3.Value = 0;
+            numKernel4.Value = -1;
+            numKernel5.Value = 5;
+            numKernel6.Value = 1;
+            numKernel7.Value = 0;
+            numKernel8.Value = 1;
+            numKernel9.Value = 2;
         }
     }
 }
