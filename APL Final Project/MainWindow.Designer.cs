@@ -500,7 +500,7 @@ namespace APL_Final_Project
             this.btnKernel1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnKernel1.Location = new System.Drawing.Point(10, 163);
             this.btnKernel1.Name = "btnKernel1";
-            this.btnKernel1.Size = new System.Drawing.Size(100, 100);
+            this.btnKernel1.Size = new System.Drawing.Size(75, 71);
             this.btnKernel1.TabIndex = 50;
             this.btnKernel1.Text = "btnKernel1";
             this.btnKernel1.UseVisualStyleBackColor = true;
@@ -509,9 +509,9 @@ namespace APL_Final_Project
             // btnKernel2
             // 
             this.btnKernel2.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnKernel2.Location = new System.Drawing.Point(116, 163);
+            this.btnKernel2.Location = new System.Drawing.Point(91, 163);
             this.btnKernel2.Name = "btnKernel2";
-            this.btnKernel2.Size = new System.Drawing.Size(97, 100);
+            this.btnKernel2.Size = new System.Drawing.Size(75, 71);
             this.btnKernel2.TabIndex = 51;
             this.btnKernel2.Text = "button2";
             this.btnKernel2.UseVisualStyleBackColor = true;
@@ -520,9 +520,9 @@ namespace APL_Final_Project
             // btnKernel3
             // 
             this.btnKernel3.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnKernel3.Location = new System.Drawing.Point(10, 269);
+            this.btnKernel3.Location = new System.Drawing.Point(172, 163);
             this.btnKernel3.Name = "btnKernel3";
-            this.btnKernel3.Size = new System.Drawing.Size(100, 100);
+            this.btnKernel3.Size = new System.Drawing.Size(73, 71);
             this.btnKernel3.TabIndex = 52;
             this.btnKernel3.Text = "button3";
             this.btnKernel3.UseVisualStyleBackColor = true;
@@ -531,9 +531,9 @@ namespace APL_Final_Project
             // btnKernel4
             // 
             this.btnKernel4.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnKernel4.Location = new System.Drawing.Point(116, 269);
+            this.btnKernel4.Location = new System.Drawing.Point(251, 163);
             this.btnKernel4.Name = "btnKernel4";
-            this.btnKernel4.Size = new System.Drawing.Size(97, 100);
+            this.btnKernel4.Size = new System.Drawing.Size(73, 71);
             this.btnKernel4.TabIndex = 53;
             this.btnKernel4.Text = "button4";
             this.btnKernel4.UseVisualStyleBackColor = true;
