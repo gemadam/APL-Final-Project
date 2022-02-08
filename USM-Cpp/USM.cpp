@@ -38,12 +38,6 @@ extern "C" __declspec(dllexport) void UnsharpMaskingCpp(CppBMP &input)
 		++iBufferIterator;
     }
 
-
-	int iSum = 0;
-	for (auto a = 0; a < 3; a++)
-		for (auto b = 0; b < 3; b++)
-			iSum += input.kernel[3 * b + a];
-
 	for (int y = 1; y < input.height - 1; y++)
 	{
 		// Left border

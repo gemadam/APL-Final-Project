@@ -45,7 +45,7 @@ namespace APL_Final_Project
             numKernel8.Value = kernel[7];
             numKernel9.Value = kernel[8];
 
-            cbAsmLiveReload.Checked = false;
+            cbAsmLiveReload.Checked = true;
             cbCppLiveReload.Checked = true;
             cbCppV2LiveReload.Checked = false;
             cbSamleLiveReload.Checked = true;
@@ -72,6 +72,31 @@ namespace APL_Final_Project
         private void btnOpenInputFileDialog_Click(object sender, EventArgs e)
         {
             fillTextboxWithUserInput(this.txtInputFile);
+        }
+
+        private Task<Bitmap> makeDiffAsync(Bitmap bmp1, Bitmap bmp2)
+        {
+            return Task<Bitmap>.Run(() =>
+            {
+                if (bmp1 == null || bmp2 == null)
+                    return null;
+                else if (bmp1.Height != bmp2.Height || bmp1.Width != bmp2.Width)
+                    return null;
+
+                Bitmap bitmap = new Bitmap(bmp1.Width, bmp1.Height);
+
+
+                for (var y = 0; y < bmp1.Height; y++)
+                    for (var x = 0; x < bmp1.Width; x++)
+                    {
+                        var p1 = bmp1.GetPixel(x, y);
+                        var p2 = bmp2.GetPixel(x, y);
+
+                        bitmap.SetPixel(x, y, Color.FromArgb(Math.Abs(p1.R - p2.R), Math.Abs(p1.G - p2.G), Math.Abs(p1.B - p2.B)));
+                    }
+
+                return bitmap;
+            });
         }
 
         private void fillTextboxWithUserInput(TextBox txtBox)
@@ -260,6 +285,13 @@ namespace APL_Final_Project
             numKernel7.Value = 0;
             numKernel8.Value = 1;
             numKernel9.Value = 2;
+        }
+
+        private async void button1_Click(object sender, EventArgs e)
+        {
+            var diff = await makeDiffAsync((Bitmap)picCpp.Image, (Bitmap)picAsm.Image);
+            if (diff != null)
+                picDiff.Image = ResizeImage(diff, picCpp.Image.Width, picCpp.Image.Height);
         }
     }
 }

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace APL_Final_Project
 {
-    internal static class BmpUtil
+    public static class BmpUtil
     {
         public static void splitIntoChannels(Bitmap bmp, out float[] arrR, out float[] arrG, out float[] arrB)
         {
