@@ -36,7 +36,7 @@ namespace APL_Final_Project
 
     class USM
     {
-        private static USMResult makeTest(Bitmap imgInput, int[] kernel, Action<USMFunctionInput> fUSM)
+        private static USMResult makeTest(Bitmap imgInput, decimal[] kernel, Action<USMFunctionInput> fUSM)
         {
             Stopwatch stopWatch = new Stopwatch();
 
@@ -89,17 +89,17 @@ namespace APL_Final_Project
 
         #region DLL_FUNCTIONS_TESTS
 
-        public static Task<USMResult> UnsharpMaskingCpp(Bitmap imgInput, int[] kernel)
+        public static Task<USMResult> UnsharpMaskingCpp(Bitmap imgInput, decimal[] kernel)
         {
             return Task.Run(() => makeTest(imgInput, kernel, usmCpp));
         }
 
-        public static Task<USMResult> UnsharpMaskingCppV2(Bitmap imgInput, int[] kernel)
+        public static Task<USMResult> UnsharpMaskingCppV2(Bitmap imgInput, decimal[] kernel)
         {
             return Task.Run(() => makeTest(imgInput, kernel, usmCppV2));
         }
 
-        public static Task<USMResult> UnsharpMaskingAsm(Bitmap imgInput, int[] kernel)
+        public static unsafe Task<USMResult> UnsharpMaskingAsm(Bitmap imgInput, decimal[] kernel)
         {
             return Task.Run(() => makeTest(imgInput, kernel, usmAsm));
         }

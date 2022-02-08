@@ -69,6 +69,7 @@ namespace APL_Final_Project
             this.btnKernel4 = new System.Windows.Forms.Button();
             this.picDiff = new System.Windows.Forms.PictureBox();
             this.button1 = new System.Windows.Forms.Button();
+            this.listBox1 = new System.Windows.Forms.ListBox();
             ((System.ComponentModel.ISupportInitialize)(this.picSample)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.picCpp)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.picAsm)).BeginInit();
@@ -226,7 +227,7 @@ namespace APL_Final_Project
             0,
             0,
             65536});
-            this.numKernel1.Location = new System.Drawing.Point(12, 75);
+            this.numKernel1.Location = new System.Drawing.Point(12, 159);
             this.numKernel1.Minimum = new decimal(new int[] {
             100,
             0,
@@ -240,7 +241,7 @@ namespace APL_Final_Project
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(9, 59);
+            this.label4.Location = new System.Drawing.Point(9, 143);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(37, 13);
             this.label4.TabIndex = 23;
@@ -278,7 +279,7 @@ namespace APL_Final_Project
             0,
             0,
             65536});
-            this.numKernel2.Location = new System.Drawing.Point(91, 75);
+            this.numKernel2.Location = new System.Drawing.Point(91, 159);
             this.numKernel2.Minimum = new decimal(new int[] {
             100,
             0,
@@ -297,7 +298,7 @@ namespace APL_Final_Project
             0,
             0,
             65536});
-            this.numKernel3.Location = new System.Drawing.Point(170, 75);
+            this.numKernel3.Location = new System.Drawing.Point(170, 159);
             this.numKernel3.Minimum = new decimal(new int[] {
             100,
             0,
@@ -316,7 +317,7 @@ namespace APL_Final_Project
             0,
             0,
             65536});
-            this.numKernel6.Location = new System.Drawing.Point(170, 101);
+            this.numKernel6.Location = new System.Drawing.Point(170, 185);
             this.numKernel6.Minimum = new decimal(new int[] {
             100,
             0,
@@ -335,7 +336,7 @@ namespace APL_Final_Project
             0,
             0,
             65536});
-            this.numKernel5.Location = new System.Drawing.Point(91, 101);
+            this.numKernel5.Location = new System.Drawing.Point(91, 185);
             this.numKernel5.Minimum = new decimal(new int[] {
             100,
             0,
@@ -354,7 +355,7 @@ namespace APL_Final_Project
             0,
             0,
             65536});
-            this.numKernel4.Location = new System.Drawing.Point(12, 101);
+            this.numKernel4.Location = new System.Drawing.Point(12, 185);
             this.numKernel4.Minimum = new decimal(new int[] {
             100,
             0,
@@ -373,7 +374,7 @@ namespace APL_Final_Project
             0,
             0,
             65536});
-            this.numKernel9.Location = new System.Drawing.Point(170, 127);
+            this.numKernel9.Location = new System.Drawing.Point(170, 211);
             this.numKernel9.Minimum = new decimal(new int[] {
             100,
             0,
@@ -392,7 +393,7 @@ namespace APL_Final_Project
             0,
             0,
             65536});
-            this.numKernel8.Location = new System.Drawing.Point(91, 127);
+            this.numKernel8.Location = new System.Drawing.Point(91, 211);
             this.numKernel8.Minimum = new decimal(new int[] {
             100,
             0,
@@ -411,7 +412,7 @@ namespace APL_Final_Project
             0,
             0,
             65536});
-            this.numKernel7.Location = new System.Drawing.Point(12, 127);
+            this.numKernel7.Location = new System.Drawing.Point(12, 211);
             this.numKernel7.Minimum = new decimal(new int[] {
             100,
             0,
@@ -490,9 +491,9 @@ namespace APL_Final_Project
             // 
             // btnPerformance
             // 
-            this.btnPerformance.Location = new System.Drawing.Point(12, 602);
+            this.btnPerformance.Location = new System.Drawing.Point(12, 633);
             this.btnPerformance.Name = "btnPerformance";
-            this.btnPerformance.Size = new System.Drawing.Size(95, 95);
+            this.btnPerformance.Size = new System.Drawing.Size(75, 72);
             this.btnPerformance.TabIndex = 49;
             this.btnPerformance.Text = "Performance";
             this.btnPerformance.UseVisualStyleBackColor = true;
@@ -501,7 +502,7 @@ namespace APL_Final_Project
             // btnKernel1
             // 
             this.btnKernel1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnKernel1.Location = new System.Drawing.Point(10, 163);
+            this.btnKernel1.Location = new System.Drawing.Point(10, 247);
             this.btnKernel1.Name = "btnKernel1";
             this.btnKernel1.Size = new System.Drawing.Size(75, 71);
             this.btnKernel1.TabIndex = 50;
@@ -512,7 +513,7 @@ namespace APL_Final_Project
             // btnKernel2
             // 
             this.btnKernel2.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnKernel2.Location = new System.Drawing.Point(91, 163);
+            this.btnKernel2.Location = new System.Drawing.Point(91, 247);
             this.btnKernel2.Name = "btnKernel2";
             this.btnKernel2.Size = new System.Drawing.Size(75, 71);
             this.btnKernel2.TabIndex = 51;
@@ -523,7 +524,7 @@ namespace APL_Final_Project
             // btnKernel3
             // 
             this.btnKernel3.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnKernel3.Location = new System.Drawing.Point(172, 163);
+            this.btnKernel3.Location = new System.Drawing.Point(172, 247);
             this.btnKernel3.Name = "btnKernel3";
             this.btnKernel3.Size = new System.Drawing.Size(73, 71);
             this.btnKernel3.TabIndex = 52;
@@ -534,7 +535,7 @@ namespace APL_Final_Project
             // btnKernel4
             // 
             this.btnKernel4.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnKernel4.Location = new System.Drawing.Point(251, 163);
+            this.btnKernel4.Location = new System.Drawing.Point(251, 247);
             this.btnKernel4.Name = "btnKernel4";
             this.btnKernel4.Size = new System.Drawing.Size(73, 71);
             this.btnKernel4.TabIndex = 53;
@@ -544,7 +545,7 @@ namespace APL_Final_Project
             // 
             // picDiff
             // 
-            this.picDiff.Location = new System.Drawing.Point(10, 298);
+            this.picDiff.Location = new System.Drawing.Point(10, 329);
             this.picDiff.Name = "picDiff";
             this.picDiff.Size = new System.Drawing.Size(395, 298);
             this.picDiff.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
@@ -553,19 +554,29 @@ namespace APL_Final_Project
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(113, 602);
+            this.button1.Location = new System.Drawing.Point(91, 633);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(95, 95);
+            this.button1.Size = new System.Drawing.Size(75, 72);
             this.button1.TabIndex = 56;
             this.button1.Text = "Make diff";
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
+            // listBox1
+            // 
+            this.listBox1.FormattingEnabled = true;
+            this.listBox1.Location = new System.Drawing.Point(12, 51);
+            this.listBox1.Name = "listBox1";
+            this.listBox1.Size = new System.Drawing.Size(398, 82);
+            this.listBox1.TabIndex = 57;
+            this.listBox1.SelectedIndexChanged += new System.EventHandler(this.listBox1_SelectedIndexChanged);
             // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1216, 709);
+            this.Controls.Add(this.listBox1);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.picDiff);
             this.Controls.Add(this.btnKernel4);
@@ -668,6 +679,7 @@ namespace APL_Final_Project
         private System.Windows.Forms.Button btnKernel4;
         private System.Windows.Forms.PictureBox picDiff;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.ListBox listBox1;
     }
 }
 

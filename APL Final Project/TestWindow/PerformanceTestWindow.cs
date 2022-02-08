@@ -50,7 +50,7 @@ namespace APL_Final_Project.TestWindow
             var cpu = new ManagementObjectSearcher("select * from Win32_Processor").Get().Cast<ManagementObject>().First();
             this.chartData.Titles.Add("Performance test on " + (string)cpu["Name"]);
 
-            int[] kernel = { 
+            decimal[] kernel = { 
                 0, 0, 0, 
                 0, 0, 1, 
                 0, 0, 0 

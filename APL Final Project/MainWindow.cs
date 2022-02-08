@@ -16,7 +16,7 @@ namespace APL_Final_Project
 {
     public partial class MainWindow : Form
     {
-        private static int[] kernel = new int[]
+        private static decimal[] kernel = new decimal[]
         {
             0, -1, 0,
             -1, 5, -1,
@@ -67,6 +67,16 @@ namespace APL_Final_Project
             btnKernel4.Text  = "-2 -1  0" + Environment.NewLine;
             btnKernel4.Text += "-1  5  1" + Environment.NewLine;
             btnKernel4.Text += " 0  1  2" + Environment.NewLine;
+
+            listBox1.Items.Add("Borders.png");
+            listBox1.Items.Add("BordersVert.png");
+            listBox1.Items.Add("BordersHor.png");
+            listBox1.Items.Add("Corners.bmp");
+            listBox1.Items.Add("Multicolor.png");
+            listBox1.Items.Add("Squares.jpg");
+            listBox1.Items.Add("Pattern.jpg");
+            listBox1.Items.Add("audi.png");
+            listBox1.Items.Add("HD.jpg");
         }
 
         private void btnOpenInputFileDialog_Click(object sender, EventArgs e)
@@ -109,7 +119,7 @@ namespace APL_Final_Project
                 txtBox.Text = this.fileDialog.SafeFileName;
         }
 
-        private async Task btnUSMClick(Button btnUSM, Label lbResult, PictureBox picBox, CheckBox cbReload, Func<Bitmap, int[], Task<USMResult>> fUSM)
+        private async Task btnUSMClick(Button btnUSM, Label lbResult, PictureBox picBox, CheckBox cbReload, Func<Bitmap, decimal[], Task<USMResult>> fUSM)
         {
             btnUSM.Enabled = false;
             cbReload.Enabled = false;
@@ -286,6 +296,11 @@ namespace APL_Final_Project
             var diff = await makeDiffAsync((Bitmap)picCpp.Image, (Bitmap)picAsm.Image);
             if (diff != null)
                 picDiff.Image = ResizeImage(diff, picCpp.Image.Width, picCpp.Image.Height);
+        }
+
+        private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            txtInputFile.Text = listBox1.Text;
         }
     }
 }

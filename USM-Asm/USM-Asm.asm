@@ -1,24 +1,100 @@
 PUBLIC  UnsharpMasking
 
 _TEXT  SEGMENT
+
+; =======================================================================================
+;  Macro computes address of the value in 2D array
+;   _a - Address of the array
+;   _x - X index
+;   _y - Y index
+;   _w - Width of the array
+;  Address is returned in rax, offset in rbx.
+; =======================================================================================
+IndexMacro MACRO _a, _x, _y, _w
+
+    ; Convert index to address
+    xor rax, rax
+    mov rax, _y             ; How many rows to skip
+    mul _w                  ; How many values to skip vertically
+    add rax, _x             ; How many values to skip horizontally
+    mov rbx, 4              ; REAL4 size
+    mul rbx                 ; Multiply by REAL4 size
+    mov rbx, rax            ; Save offset
+    add rax, _a             ; Add address in memory
+
+ENDM
+
+
+; =======================================================================================
+;  Macro reads the input data structure
+;   _pInputStruct - Address of where address of the input structure will be stored
+;   _imgWidth - Address of where image width will be stored
+;   _imgHeight - Address of where image height will be stored
+;   _pKernel - 
+;   _pInChannelR - 
+;   _pInChannelG - 
+;   _pInChannelB - 
+;   _pOutChannelR - 
+;   _pOutChannelG - 
+;   _pOutChannelB - 
+; =======================================================================================
+ProcessInputStructureMacro MACRO _pInputStruct, _imgWidth, _imgHeight, _pKernel, _pInChannelR, _pInChannelG, _pInChannelB, _pOutChannelR, _pOutChannelG, _pOutChannelB
+
+    mov rax, rcx                           ; 1st argument of the function is a pointer to the input structure
+    mov _pInputStruct, rax                 ; Save the pointer to the input structure
+
+    mov ebx, [rax]                         ; Obtain the value of the 1st structure member
+    mov DWORD PTR _imgWidth, ebx           ; Save the value in imgWidth variable
+
+    mov ebx, [rax + 4]                     ; Move to the 2nd element of the structure
+    mov DWORD PTR _imgHeight, ebx          ; Save the value in imgHeight variable
+
+    mov rbx, [rax + 8]                     ; Move to the 3rd element of the structure
+    mov QWORD PTR _pKernel, rbx            ; Save this pointer as pKernel
+
+    mov rbx, [rax + 16]                    ; Move to the 4th element of the structure
+    mov QWORD PTR _pInChannelR, rbx        ; Save this pointer as pInChannelR
+
+    mov rbx, [rax + 24]                    ; Move to the 5th element of the structure
+    mov QWORD PTR _pInChannelG, rbx        ; Save this pointer as pInChannelG
+
+    mov rbx, [rax + 32]                    ; Move to the 5th element of the structure
+    mov QWORD PTR _pInChannelB, rbx        ; Save this pointer as pInChannelB
+
+    mov rbx, [rax + 40]                    ; Move to the 6th element of the structure
+    mov QWORD PTR _pOutChannelR, rbx       ; Save this pointer as pOutChannelR
+
+    mov rbx, [rax + 48]                    ; Move to the 7th element of the structure
+    mov QWORD PTR _pOutChannelG, rbx       ; Save this pointer as pOutChannelG
+
+    mov rbx, [rax + 56]                    ; Move to the 8th element of the structure
+    mov QWORD PTR _pOutChannelB, rbx       ; Save this pointer as pOutChannelB
+
+ENDM
+
+
+; =======================================================================================
+;  Unsharp Masking Algorithm
+; =======================================================================================
 UnsharpMasking  PROC
 .data
     ; Local variables
-    accR                BYTE        0
-    accG                BYTE        0
-    accB                BYTE        0
-    originalR           BYTE        0
-    originalG           BYTE        0
-    originalB           BYTE        0
+    newPixelR           REAL4       0.0
+    newPixelG           REAL4       0.0
+    newPixelB           REAL4       0.0
+    originalR           REAL4       0.0
+    originalG           REAL4       0.0
+    originalB           REAL4       0.0
+    pixelDataTypeSize   QWORD       4
+    initNewPixelVal     REAL4       1.0
 
     ; Loop iteretors
-    iIteratorX          QWORD       0
-    iIteratorY          QWORD       0
-    iLoop1Iterator      QWORD       0
-    iLoop2Iterator      QWORD       0
+    iIteratorX                   QWORD       0
+    iIteratorY                   QWORD       0
+    iNeighbourhoodIteratorX      QWORD       0
+    iNeighbourhoodIteratorY      QWORD       0
 
     ; Auxiliary pointers
-    iOutputIterator     QWORD       0
 
     ; Input structure pointers
     pInputStruct        QWORD       0
@@ -35,367 +111,183 @@ UnsharpMasking  PROC
 .code
 
     ; Initialize local variables with default values
-    mov [iOutputIterator], 0
+    mov [iIteratorX], 0
+    mov [iIteratorY], 0
+    mov [iNeighbourhoodIteratorX], 0
+    mov [iNeighbourhoodIteratorY], 0
 
 
     ; Processing of the input structure
-    mov rax, rcx                        ; 1st argument of the function is a pointer to the input structure
-    mov [pInputStruct], rax             ; Save the pointer to the input structure
-
-    mov ebx, [rax]                      ; Obtain the value of the 1st structure member
-    mov DWORD PTR [imgWidth], ebx       ; Save the value in imgWidth variable
-
-    mov ebx, [rax + 4]                  ; Move to the 2nd element of the structure
-    mov DWORD PTR [imgHeight], ebx      ; Save the value in imgHeight variable
-
-    mov rbx, [rax + 8]                  ; Move to the 3rd element of the structure
-    mov QWORD PTR [pKernel], rbx        ; Save this pointer as pKernel
-
-    mov rbx, [rax + 16]                 ; Move to the 4th element of the structure
-    mov QWORD PTR [pInChannelR], rbx    ; Save this pointer as pInChannelR
-
-    mov rbx, [rax + 24]                 ; Move to the 5th element of the structure
-    mov QWORD PTR [pInChannelG], rbx    ; Save this pointer as pInChannelG
-
-    mov rbx, [rax + 32]                 ; Move to the 5th element of the structure
-    mov QWORD PTR [pInChannelB], rbx    ; Save this pointer as pInChannelB
-
-    mov rbx, [rax + 40]                 ; Move to the 6th element of the structure
-    mov QWORD PTR [pOutChannelR], rbx   ; Save this pointer as pOutChannelR
-
-    mov rbx, [rax + 48]                 ; Move to the 7th element of the structure
-    mov QWORD PTR [pOutChannelG], rbx   ; Save this pointer as pOutChannelG
-
-    mov rbx, [rax + 56]                 ; Move to the 8th element of the structure
-    mov QWORD PTR [pOutChannelB], rbx   ; Save this pointer as pOutChannelB
+    ProcessInputStructureMacro [pInputStruct], [imgWidth], [imgHeight], [pKernel], [pInChannelR], [pInChannelG], [pInChannelB], [pOutChannelR], [pOutChannelG], [pOutChannelB]
 
 
+    ; Registers r8-10 will be used for storing addresses of input channels
+    xor r8, r8                              ; Make sure r8-10 are clean
+    xor r9, r9
+    xor r10, r10
 
-; Rewrite the top border of the image to the output
-TopBorderLoop:
-    mov [iIteratorX], 0
-
-TopBorderLoop_body:
-
-    ; Move input addresses to MMX registers
-    movq mm0, pInChannelR
-    movq mm1, pInChannelG
-    movq mm2, pInChannelB
-
-    ; Apply index on these addresses
-    paddq mm0, [iIteratorX]
-    paddq mm1, [iIteratorX]
-    paddq mm2, [iIteratorX]
+    mov r8, [pInChannelR]                   ; Address of input pixel R channel
+    mov r9, [pInChannelG]                   ; Address of input pixel G channel
+    mov r10, [pInChannelB]                  ; Address of input pixel B channel
     
-    ; Move output addresses to MMX registers
-    movq mm3, pOutChannelR
-    movq mm4, pOutChannelG
-    movq mm5, pOutChannelB
-    
-    ; Apply index on these addresses
-    paddq mm3, [iOutputIterator]
-    paddq mm4, [iOutputIterator]
-    paddq mm5, [iOutputIterator]
+    ; Registers r11-13 will be used for storing addresses of output channels
+    xor r11, r11                            ; Make sure r11-13 are clean
+    xor r12, r12
+    xor r13, r13
 
-    ; Rewrite channel R
-    movq rax, mm0
-    mov rax, [rax]
-    movq rbx, mm3
-    mov [rbx], rax
-    
-    ; Rewrite channel G
-    movq rax, mm1
-    mov rax, [rax]
-    movq rbx, mm4
-    mov [rbx], rax
-    
-    ; Rewrite channel B
-    movq rax, mm3
-    mov rax, [rax]
-    movq rbx, mm5
-    mov [rbx], rax
+    mov r11, [pOutChannelR]                 ; Address of output pixel R channel
+    mov r12, [pOutChannelG]                 ; Address of output pixel G channel
+    mov r13, [pOutChannelB]                 ; Address of output pixel B channel
 
-    ; Move output iterator to the next pixel
-    add [iOutputIterator], 1
-    
-    ; Increment iterator of TopBorderLoop and check the TopBorderLoop condition
-    inc [iIteratorX]
-    xor rax, rax
-    mov eax, [imgWidth]
-    cmp rax, [iIteratorX]
-    jne TopBorderLoop_body
+    ; Register r14 will be used for storing pixel address increment
+    xor r14, r14                            ; Make sure r14 is clean
+    mov r14, [pixelDataTypeSize]
+
+    ; Register r15 will be used for storing kernel address
+    xor r15, r15                            ; Make sure r15 is clean
+    mov r15, [pKernel]
 
 
+    ; Rewrite the top border of the image to the output
+    TopBorderLoop:                          ; Loop initialization
+        mov [iIteratorX], 0
 
-; Center of the image
-LoopCenterY:
-    mov [iIteratorY], 1
+    TopBorderLoop_body:                     ; Loop body
 
-LoopCenterY_body:
-    
-    ; Rewrite the left border
-
-    mov rax, [iIteratorY]       ; Compute offset on input image
-    mul [imgWidth]
-    mov rdx, rax                ; rdx stores the offset on input image
-
-
-    mov rcx, rdx                ; Compute pinter to pixel R channel value
-    add rcx, [pInChannelR]
-    mov al, BYTE PTR [rcx]      ; al stores the value of R channel
-    
-    mov rcx, [iOutputIterator]  ; Compute pinter to output pixel R channel value
-    add rcx, [pOutChannelR]
-    mov [rcx], al               ; Write R channel to output pixel
-    
-
-    mov rcx, rdx                ; Compute pinter to pixel G channel value
-    add rcx, [pInChannelG]
-    mov al, BYTE PTR [rcx]      ; al stores the value of G channel
-    
-    mov rcx, [iOutputIterator]  ; Compute pinter to output pixel G channel value     
-    add rcx, [pOutChannelG]
-    mov [rcx], al               ; Write G channel to output pixel
-
-    
-    mov rcx, rdx                ; Compute pinter to pixel B channel value
-    add rcx, [pInChannelB]
-    mov al, BYTE PTR [rcx]      ; al stores the value of B channel
-    
-    mov rcx, [iOutputIterator]  ; Compute pinter to output pixel B channel value       
-    add rcx, [pOutChannelB]
-    mov [rcx], al               ; Write B channel to output pixel
-
-
-    ; Moves output iterator to the next pixel
-    add [iOutputIterator], 1
-
-
-    ; Process the center of the image
-    LoopCenterX:
-        mov [iIteratorX], 1
-
-    LoopCenterX_body:
-
-        xor rax, rax
-        mov eax, [imgWidth]
-        mul [iIteratorY]
-        add rax, [iIteratorX]
-        mov rdx, rax                ; rdx stores offset of input pixel
-
-        ; Value of original channel R
-        mov rax, [pInChannelR]
-        add rax, rdx
-        xor rbx, rbx
-        mov bl, BYTE PTR [rax]
-        mov BYTE PTR [originalR], bl
-
-        ; Value of original channel G
-        mov rax, [pInChannelG]
-        add rax, rdx
-        xor rbx, rbx
-        mov bl, BYTE PTR [rax]
-        mov BYTE PTR [originalG], bl
-
-        ; Value of original channel B
-        mov rax, [pInChannelB]
-        add rax, rdx
-        xor rbx, rbx
-        mov bl, BYTE PTR [rax]
-        mov BYTE PTR [originalB], bl
-
-        mov [accR], 0       ; Initialize acc 'array'
-        mov [accG], 0
-        mov [accB], 0    
+        ; Rewrite input to output
+        call RewritePixelFromInputToOutput
         
-        ; Process neigbourhood of the pixel
-        Loop1:
-            mov [iLoop1Iterator], 0
-
-        Loop1_body:
-            Loop2:
-                mov [iLoop2Iterator], 0
-
-            Loop2_body:
-
-                mov rax, [pInChannelR]
-                movq mm0, rax
-                
-                mov rax, [pInChannelG]
-                movq mm1, rax
-                
-                mov rax, [pInChannelB]
-                movq mm2, rax
+        ; After each loop iteration
+        inc [iIteratorX]                    ; Increment loop counter
+        xor rax, rax
+        mov eax, [imgWidth]                 ; Prepare condition
+        cmp rax, [iIteratorX]               ; Check loop condition
+        jne TopBorderLoop_body              ; Repeat loop until condition is met
 
 
-                mov rax, [iIteratorY]
-                add rax, [iLoop2Iterator]
-                sub rax, 1
-                mul [imgWidth]
-                add rax, [iIteratorX]
-                add rax, [iLoop1Iterator]
-                sub rax, 1
-                movq mm3, rax
-                
-                paddq mm0, mm3
-                paddq mm1, mm3
-                paddq mm2, mm3
 
-                mov rax, 12
-                mul [iLoop2Iterator]
-                mov rbx, rax
-                mov rax, 4
-                mul [iLoop1Iterator]
-                add rax, rbx
-                add rax, [pKernel]
-                mov rbx, [rax]                ; Move kernel value to the rbx
+    ; Center of the image
+    LoopCenterY:                            ; Loop initialization
+        mov [iIteratorY], 1
+
+    LoopCenterY_body:                       ; Loop body
+
+        ; Rewrite left border pixel
+        call RewritePixelFromInputToOutput
 
 
-                movq rax, mm0
-                mov rax, [rax]
-                mul ebx
-                add [accR], al
-                
-                movq rax, mm1
-                mov rax, [rax]
-                mul ebx
-                add [accG], al
-                
-                movq rax, mm2
-                mov rax, [rax]
-                mul ebx
-                add [accB], al
+        ; Process the center of the image
+        LoopCenterX:                                                ; Loop initialization
+            mov [iIteratorX], 1
 
-                ; Increments iterator of Loop2 and checks the Loop2 condition
-                inc [iLoop2Iterator]
-                xor rax, rax
-                mov eax, 3
-                cmp rax, [iLoop2Iterator]
-                jne Loop2_body
+        LoopCenterX_body:                                           ; Loop body
+            
+            IndexMacro [pInChannelR], [iIteratorX], [iIteratorY], [imgWidth]    ; Obtain address of channel R value
+            mov ebx, REAL4 PTR [rax]
+            mov REAL4 PTR [r11], ebx                                            ; Rewrite R value from input to the output
+            
+            add r8, r14                                                         ; Input channel R
+            add r11, r14                                                        ; Output channel R
 
-            ; Increments iterator of Loop1 and checks the Loop1 condition
-            inc [iLoop1Iterator]
+            
+            IndexMacro [pInChannelG], [iIteratorX], [iIteratorY], [imgWidth]    ; Obtain address of channel G value
+            mov ebx, REAL4 PTR [rax]
+            mov REAL4 PTR [r12], ebx                                            ; Rewrite G value from input to the output
+            
+            add r9, r14                                                         ; Input channel G
+            add r12, r14                                                        ; Output channel G
+
+            
+            IndexMacro [pInChannelB], [iIteratorX], [iIteratorY], [imgWidth]    ; Obtain address of channel B value
+            mov ebx, REAL4 PTR [rax]
+            mov REAL4 PTR [r13], ebx                                            ; Rewrite B value from input to the output
+            
+            add r10, r14                                                        ; Input channel B
+            add r13, r14                                                        ; Output channel B
+
+
+            ; Increments iterator of LoopCenterX and checks the LoopCenterX condition
+            inc [iIteratorX]
             xor rax, rax
-            mov eax, 3
-            cmp rax, [iLoop1Iterator]
-            jne Loop1_body
-        
+            mov eax, [imgWidth]
+            add rax, -1
+            cmp rax, [iIteratorX]
+            jne LoopCenterX_body
 
-        ; 'Merge' channels together
-        mov al, [originalR]
-        shl rax, 8
-        mov al, [originalG]
-        shl rax, 8
-        mov al, [originalB]
-        movq mm0, rax               ; mm0 stores 'merged' RGB channels
-        movq mm1, rax               ; mm1 stores 'merged' RGB channels
-        
-        ; 'Merge' acc together
-        mov al, [accR]
-        shl rax, 8
-        mov al, [accG]
-        shl rax, 8
-        mov al, [accB]
-        movq mm2, rax               ; mm2 stores 'merged' acc of RGB channels
 
-        psubb mm1, mm2              ; Substract acc from original channel values
-        paddb mm0, mm1              ; Add the result to output channel values
+        ; Rewrite the right border pixel
+        call RewritePixelFromInputToOutput
 
-        movq rcx, mm0               ; Move 'merged' result to rcx
-        
 
+        ; Increments iterator of LoopCenterY and checks the LoopCenterY condition
+        inc [iIteratorY]
         xor rax, rax
-        mov eax, [imgWidth]
-        mul [iIteratorY]
-        add rax, [iIteratorX]
-
-        movq mm0, [pOutChannelB]    ; 
-        movq mm1, [pOutChannelG]    ; 
-        movq mm2, [pOutChannelR]    ;
-        movq mm3, rax
-
-        paddq mm0, mm3
-        paddq mm1, mm3
-        paddq mm2, mm3
-        
-        movq rbx, mm0
-        mov [rbx], cl               ; Save output channel B
-        
-        movq rbx, mm1
-        shr rcx, 8
-        mov [rbx], cl               ; Save output channel G
-        
-        movq rbx, mm2
-        shr rcx, 8
-        mov [rbx], cl               ; Save output channel R
-
-
-        ; Moves output iterator to the next pixel
-        add [iOutputIterator], 1
-
-        ; Increments iterator of LoopCenterX and checks the LoopCenterX condition
-        inc [iIteratorX]
-        xor rax, rax
-        mov eax, [imgWidth]
+        mov eax, [imgHeight]
         add rax, -1
-        cmp rax, [iIteratorX]
-        jne LoopCenterX_body
+        cmp rax, [iIteratorY]
+        jne LoopCenterY_body
 
 
+    ; Rewrite the bottom border of the image to the output
+    BottomBorderLoop:                       ; Loop initialization
+        mov [iIteratorX], 0
 
+    BottomBorderLoop_body:                  ; Loop body
 
-    ; Rewrite the right border
-    mov rax, [iIteratorY]       ; Compute offset on input image
-    mul [imgWidth]
-    add eax, [imgWidth]
-    add rax, -1
-    mov rdx, rax                ; rdx stores the offset on input image
-
-
-    mov rcx, rdx                ; Compute pinter to pixel R channel value
-    add rcx, [pInChannelR]
-    mov al, BYTE PTR [rcx]      ; al stores the value of R channel
-    
-    mov rcx, [iOutputIterator]  ; Compute pinter to output pixel R channel value
-    add rcx, [pOutChannelR]
-    mov [rcx], al               ; Write R channel to output pixel
-    
-
-    mov rcx, rdx                ; Compute pinter to pixel G channel value
-    add rcx, [pInChannelG]
-    mov al, BYTE PTR [rcx]      ; al stores the value of G channel
-    
-    mov rcx, [iOutputIterator]  ; Compute pinter to output pixel G channel value     
-    add rcx, [pOutChannelG]
-    mov [rcx], al               ; Write G channel to output pixel
-
-    
-    mov rcx, rdx                ; Compute pinter to pixel B channel value
-    add rcx, [pInChannelB]
-    mov al, BYTE PTR [rcx]      ; al stores the value of B channel
-    
-    mov rcx, [iOutputIterator]  ; Compute pinter to output pixel B channel value       
-    add rcx, [pOutChannelB]
-    mov [rcx], al               ; Write B channel to output pixel
-
-
-    ; Moves output iterator to the next pixel
-    add [iOutputIterator], 1
-
-
-    ; Increments iterator of LoopCenterY and checks the LoopCenterY condition
-    inc [iIteratorY]
-    xor rax, rax
-    mov eax, [imgHeight]
-    cmp rax, [iIteratorY]
-    jne LoopCenterY_body
-
+        ; Rewrite input to output
+        call RewritePixelFromInputToOutput
+        
+        ; After each loop iteration
+        inc [iIteratorX]                    ; Increment loop counter
+        xor rax, rax
+        mov eax, [imgWidth]                 ; Prepare condition
+        cmp rax, [iIteratorX]               ; Check loop condition
+        jne BottomBorderLoop_body           ; Repeat loop until condition is met
 
 
     ret
     
 
 UnsharpMasking ENDP
+
+
+
+; =======================================================================================
+;  Funtion rewrites pixel channels from input to output and moves addresses by one pixel
+;   r8  - Address of input R channel
+;   r9  - Address of input G channel
+;   r10 - Address of input B channel
+;   r11 - Address of output R channel
+;   r12 - Address of output G channel
+;   r13 - Address of output B channel
+; =======================================================================================
+RewritePixelFromInputToOutput  PROC
+.data
+
+.code
+
+    ; Rewrite input to output
+    mov eax, REAL4 PTR [r8]             ; Change address of input R channel to value under it
+    mov REAL4 PTR [r11], eax            ; Rewrite R value from input to the output
+
+    mov eax, REAL4 PTR [r9]             ; Change address of input G channel to value under it
+    mov REAL4 PTR [r12], eax            ; Rewrite G value from input to the output
+
+    mov eax, REAL4 PTR [r10]            ; Change address of input B channel to value under it
+    mov REAL4 PTR [r13], eax            ; Rewrite B value from input to the output
+
+    ; Move addresses by one pixel
+    add r8, r14                         ; Input channel R
+    add r9, r14                         ; Input channel G
+    add r10, r14                        ; Input channel B
+    add r11, r14                        ; Output channel R
+    add r12, r14                        ; Output channel G
+    add r13, r14                        ; Output channel B
+
+    ret
+
+RewritePixelFromInputToOutput ENDP
+
 
 _TEXT  ENDS
 
