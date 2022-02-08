@@ -507,7 +507,7 @@ namespace APL_Final_Project
             this.btnKernel1.TabIndex = 50;
             this.btnKernel1.Text = "btnKernel1";
             this.btnKernel1.UseVisualStyleBackColor = true;
-            this.btnKernel1.Click += new System.EventHandler(this.btnKernel1_Click);
+            this.btnKernel1.Click += new System.EventHandler(this.btnKernel_Click);
             // 
             // btnKernel2
             // 
@@ -518,7 +518,7 @@ namespace APL_Final_Project
             this.btnKernel2.TabIndex = 51;
             this.btnKernel2.Text = "button2";
             this.btnKernel2.UseVisualStyleBackColor = true;
-            this.btnKernel2.Click += new System.EventHandler(this.btnKernel2_Click);
+            this.btnKernel2.Click += new System.EventHandler(this.btnKernel_Click);
             // 
             // btnKernel3
             // 
@@ -529,7 +529,7 @@ namespace APL_Final_Project
             this.btnKernel3.TabIndex = 52;
             this.btnKernel3.Text = "button3";
             this.btnKernel3.UseVisualStyleBackColor = true;
-            this.btnKernel3.Click += new System.EventHandler(this.btnKernel3_Click);
+            this.btnKernel3.Click += new System.EventHandler(this.btnKernel_Click);
             // 
             // btnKernel4
             // 
@@ -540,7 +540,7 @@ namespace APL_Final_Project
             this.btnKernel4.TabIndex = 53;
             this.btnKernel4.Text = "button4";
             this.btnKernel4.UseVisualStyleBackColor = true;
-            this.btnKernel4.Click += new System.EventHandler(this.btnKernel4_Click);
+            this.btnKernel4.Click += new System.EventHandler(this.btnKernel_Click);
             // 
             // picDiff
             // 

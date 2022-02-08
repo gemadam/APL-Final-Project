@@ -109,29 +109,34 @@ namespace APL_Final_Project
                 txtBox.Text = this.fileDialog.SafeFileName;
         }
 
-        private async void btnUnsharpMaskingCpp_Click(object sender, EventArgs e)
+        private async Task btnUSMClick(Button btnUSM, Label lbResult, PictureBox picBox, CheckBox cbReload, Func<Bitmap, int[], Task<USMResult>> fUSM)
         {
-            lbBestTimeCpp.Text = "Executing...";
+            btnUSM.Enabled = false;
+            cbReload.Enabled = false;
+            var cbState = cbReload.Checked;
+            cbReload.Checked = false;
+
+            lbResult.Text = "Executing...";
 
             var img = Image.FromFile(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), txtInputFile.Text));
-            var result = await USM.UnsharpMaskingCpp(new Bitmap(img), kernel);
-            result.Image.Save(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), "Output-cpp.bmp"));
-            lbBestTimeCpp.Text = result.ExecutionTimeString;
+            var result = await fUSM.Invoke(new Bitmap(img), kernel);
 
+            picBox.Image = ResizeImage((Bitmap)result.Image, picBox.Width, picBox.Height);
+            lbResult.Text = result.ExecutionTimeString;
 
-            picCpp.Image = ResizeImage((Bitmap)result.Image, picCpp.Width, picCpp.Height);
+            cbReload.Checked = cbState;
+            cbReload.Enabled = true;
+            btnUSM.Enabled = true;
+        }
+
+        private async void btnUnsharpMaskingCpp_Click(object sender, EventArgs e)
+        {
+            await btnUSMClick(btnUnsharpMaskingCpp, lbBestTimeCpp, picCpp, cbCppLiveReload, USM.UnsharpMaskingCpp);
         }
 
         private async void btnUnsharpMaskingAsm_Click(object sender, EventArgs e)
         {
-            lbBestTimeAsm.Text = "Executing...";
-
-            var img = Image.FromFile(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), txtInputFile.Text));
-            var result = await USM.UnsharpMaskingAsm(new Bitmap(img), kernel);
-            result.Image.Save(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), "Output-asm.bmp"));
-            lbBestTimeAsm.Text = result.ExecutionTimeString;
-
-            picAsm.Image = ResizeImage((Bitmap)result.Image, picAsm.Width, picAsm.Height);
+            await btnUSMClick(btnUnsharpMaskingAsm, lbBestTimeAsm, picAsm, cbAsmLiveReload, USM.UnsharpMaskingAsm);
         }
 
         private void liveReload(object sender, EventArgs e)
@@ -234,57 +239,46 @@ namespace APL_Final_Project
                 dialog.ShowDialog(this);
         }
 
-        private void btnKernel1_Click(object sender, EventArgs e)
+        private void setKernel(decimal[] kernel)
         {
+            var cbAsmLiveReloadChecked = cbAsmLiveReload.Checked;
+            var cbCppLiveReloadChecked = cbCppLiveReload.Checked;
+            var cbCppV2LiveReloadChecked = cbCppV2LiveReload.Checked;
+            var cbSamleLiveReloadChecked = cbSamleLiveReload.Checked;
 
-            numKernel1.Value = 0;
-            numKernel2.Value = 0;
-            numKernel3.Value = 0;
-            numKernel4.Value = 0;
-            numKernel5.Value = 1;
-            numKernel6.Value = 0;
-            numKernel7.Value = 0;
-            numKernel8.Value = 0;
-            numKernel9.Value = 0;
+            cbAsmLiveReload.Checked = false;
+            cbCppLiveReload.Checked = false;
+            cbCppV2LiveReload.Checked = false;
+            cbSamleLiveReload.Checked = false;
+
+            var i = 0;
+            numKernel1.Value = kernel[i++];
+            numKernel2.Value = kernel[i++];
+            numKernel3.Value = kernel[i++];
+            numKernel4.Value = kernel[i++];
+            numKernel5.Value = kernel[i++];
+            numKernel6.Value = kernel[i++];
+            numKernel7.Value = kernel[i++];
+            numKernel8.Value = kernel[i++];
+            numKernel9.Value = kernel[i++];
+
+            cbAsmLiveReload.Checked = cbAsmLiveReloadChecked;
+            cbCppLiveReload.Checked = cbCppLiveReloadChecked;
+            cbCppV2LiveReload.Checked = cbCppV2LiveReloadChecked;
+            cbSamleLiveReload.Checked = cbSamleLiveReloadChecked;
         }
 
-        private void btnKernel2_Click(object sender, EventArgs e)
+        private void btnKernel_Click(object sender, EventArgs e)
         {
-            numKernel1.Value = 0;
-            numKernel2.Value = -1;
-            numKernel3.Value = 0;
-            numKernel4.Value = -1;
-            numKernel5.Value = 5;
-            numKernel6.Value = -1;
-            numKernel7.Value = 0;
-            numKernel8.Value = -1;
-            numKernel9.Value = 0;
-        }
+            var btn = (Button)sender;
 
-        private void btnKernel3_Click(object sender, EventArgs e)
-        {
-            numKernel1.Value = 0;
-            numKernel2.Value = 1;
-            numKernel3.Value = 0;
-            numKernel4.Value = 1;
-            numKernel5.Value = 5;
-            numKernel6.Value = 1;
-            numKernel7.Value = 0;
-            numKernel8.Value = 1;
-            numKernel9.Value = 0;
-        }
+            this.setKernel(btn.Text
+                .Split(new string[] { " ", Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(x => Convert.ToDecimal(x))
+                .ToArray()
+            );
 
-        private void btnKernel4_Click(object sender, EventArgs e)
-        {
-            numKernel1.Value = -2;
-            numKernel2.Value = -1;
-            numKernel3.Value = 0;
-            numKernel4.Value = -1;
-            numKernel5.Value = 5;
-            numKernel6.Value = 1;
-            numKernel7.Value = 0;
-            numKernel8.Value = 1;
-            numKernel9.Value = 2;
+            liveReload(sender, e);
         }
 
         private async void button1_Click(object sender, EventArgs e)
