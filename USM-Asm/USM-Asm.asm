@@ -4,13 +4,12 @@ _TEXT  SEGMENT
 
 ; =======================================================================================
 ;  Macro computes address of the value in 2D array
-;   _a - Address of the array
 ;   _x - X index
 ;   _y - Y index
 ;   _w - Width of the array
 ;  Address is returned in rax, offset in rbx.
 ; =======================================================================================
-IndexMacro MACRO _a, _x, _y, _w
+IndexMacro MACRO _x, _y, _w
 
     ; Convert index to address
     xor rax, rax
@@ -19,8 +18,6 @@ IndexMacro MACRO _a, _x, _y, _w
     add rax, _x             ; How many values to skip horizontally
     mov rbx, 4              ; REAL4 size
     mul rbx                 ; Multiply by REAL4 size
-    mov rbx, rax            ; Save offset
-    add rax, _a             ; Add address in memory
 
 ENDM
 
@@ -79,22 +76,17 @@ ENDM
 UnsharpMasking  PROC
 .data
     ; Local variables
-    newPixelR           REAL4       0.0
-    newPixelG           REAL4       0.0
-    newPixelB           REAL4       0.0
-    originalR           REAL4       0.0
-    originalG           REAL4       0.0
-    originalB           REAL4       0.0
+    iOffset             QWORD       0
     pixelDataTypeSize   QWORD       4
     initNewPixelVal     REAL4       1.0
 
     ; Loop iteretors
     iIteratorX                   QWORD       0
     iIteratorY                   QWORD       0
-    iNeighbourhoodIteratorX      QWORD       0
-    iNeighbourhoodIteratorY      QWORD       0
+    iNeighbourhoodIterator       QWORD       0
 
     ; Auxiliary pointers
+    pNeigbour           QWORD       0
 
     ; Input structure pointers
     pInputStruct        QWORD       0
@@ -113,8 +105,8 @@ UnsharpMasking  PROC
     ; Initialize local variables with default values
     mov [iIteratorX], 0
     mov [iIteratorY], 0
-    mov [iNeighbourhoodIteratorX], 0
-    mov [iNeighbourhoodIteratorY], 0
+    mov [iNeighbourhoodIterator], 0
+    mov [iOffset], 0
 
 
     ; Processing of the input structure
@@ -181,8 +173,9 @@ UnsharpMasking  PROC
             mov [iIteratorX], 1
 
         LoopCenterX_body:                                           ; Loop body
-            
-            IndexMacro [pInChannelR], [iIteratorX], [iIteratorY], [imgWidth]    ; Obtain address of channel R value
+
+            IndexMacro [iIteratorX], [iIteratorY], [imgWidth]
+            add rax, [pInChannelR]                                              ; Obtain address of channel R value
             mov ebx, REAL4 PTR [rax]
             mov REAL4 PTR [r11], ebx                                            ; Rewrite R value from input to the output
             
@@ -190,7 +183,8 @@ UnsharpMasking  PROC
             add r11, r14                                                        ; Output channel R
 
             
-            IndexMacro [pInChannelG], [iIteratorX], [iIteratorY], [imgWidth]    ; Obtain address of channel G value
+            IndexMacro [iIteratorX], [iIteratorY], [imgWidth]
+            add rax, [pInChannelG]                                              ; Obtain address of channel G value
             mov ebx, REAL4 PTR [rax]
             mov REAL4 PTR [r12], ebx                                            ; Rewrite G value from input to the output
             
@@ -198,7 +192,8 @@ UnsharpMasking  PROC
             add r12, r14                                                        ; Output channel G
 
             
-            IndexMacro [pInChannelB], [iIteratorX], [iIteratorY], [imgWidth]    ; Obtain address of channel B value
+            IndexMacro [iIteratorX], [iIteratorY], [imgWidth]                   
+            add rax, [pInChannelB]                                              ; Obtain address of channel B value
             mov ebx, REAL4 PTR [rax]
             mov REAL4 PTR [r13], ebx                                            ; Rewrite B value from input to the output
             
