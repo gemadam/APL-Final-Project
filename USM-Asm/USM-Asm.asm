@@ -7,14 +7,15 @@ _TEXT  SEGMENT
 ;   _x - X index
 ;   _y - Y index
 ;   _w - Width of the array
-;  Address is returned in rax, offset in rbx.
+;  Offset is returned in rax
 ; =======================================================================================
 IndexMacro MACRO _x, _y, _w
 
-    ; Convert index to address
+    ; Convert index to offset
     xor rax, rax
     mov rax, _y             ; How many rows to skip
-    mul _w                  ; How many values to skip vertically
+    mov rbx, _w
+    mul rbx                 ; How many values to skip vertically
     add rax, _x             ; How many values to skip horizontally
     mov rbx, 4              ; REAL4 size
     mul rbx                 ; Multiply by REAL4 size
@@ -40,11 +41,13 @@ ProcessInputStructureMacro MACRO _pInputStruct, _imgWidth, _imgHeight, _pKernel,
     mov rax, rcx                           ; 1st argument of the function is a pointer to the input structure
     mov _pInputStruct, rax                 ; Save the pointer to the input structure
 
+    xor rbx, rbx
     mov ebx, [rax]                         ; Obtain the value of the 1st structure member
-    mov DWORD PTR _imgWidth, ebx           ; Save the value in imgWidth variable
-
+    mov QWORD PTR _imgWidth, rbx           ; Save the value in imgWidth variable
+    
+    xor rbx, rbx
     mov ebx, [rax + 4]                     ; Move to the 2nd element of the structure
-    mov DWORD PTR _imgHeight, ebx          ; Save the value in imgHeight variable
+    mov QWORD PTR _imgHeight, rbx          ; Save the value in imgHeight variable
 
     mov rbx, [rax + 8]                     ; Move to the 3rd element of the structure
     mov QWORD PTR _pKernel, rbx            ; Save this pointer as pKernel
@@ -78,7 +81,7 @@ UnsharpMasking  PROC
     ; Local variables
     iOffset             QWORD       0
     pixelDataTypeSize   QWORD       4
-    initNewPixelVal     REAL4       1.0
+    initNewPixelVal     REAL4       0.0
 
     ; Loop iteretors
     iIteratorX                   QWORD       0
@@ -90,8 +93,8 @@ UnsharpMasking  PROC
 
     ; Input structure pointers
     pInputStruct        QWORD       0
-    imgWidth            DWORD       0
-    imgHeight           DWORD       0
+    imgWidth            QWORD       0
+    imgHeight           QWORD       0
     pKernel             QWORD       0
     pInChannelR         QWORD       0
     pInChannelG         QWORD       0
@@ -151,8 +154,7 @@ UnsharpMasking  PROC
         
         ; After each loop iteration
         inc [iIteratorX]                    ; Increment loop counter
-        xor rax, rax
-        mov eax, [imgWidth]                 ; Prepare condition
+        mov rax, [imgWidth]                 ; Prepare condition
         cmp rax, [iIteratorX]               ; Check loop condition
         jne TopBorderLoop_body              ; Repeat loop until condition is met
 
@@ -174,37 +176,102 @@ UnsharpMasking  PROC
 
         LoopCenterX_body:                                           ; Loop body
 
-            IndexMacro [iIteratorX], [iIteratorY], [imgWidth]
-            add rax, [pInChannelR]                                              ; Obtain address of channel R value
-            mov ebx, REAL4 PTR [rax]
-            mov REAL4 PTR [r11], ebx                                            ; Rewrite R value from input to the output
-            
+            xor rax, rax
+            mov eax, [initNewPixelVal]
+            movups xmm5, [initNewPixelVal]           ; New R
+            movups xmm6, [initNewPixelVal]           ; New G
+            movups xmm7, [initNewPixelVal]           ; New B
+
+            LoopNeigbours:
+                mov [iNeighbourhoodIterator], -1
+
+            LoopNeigbours_body:                                     ; Loop body
+
+
+                ; Prepare kernel
+                mov rcx, [iNeighbourhoodIterator]                   ; Compute row index of the neighbours
+                add rcx, 1
+                IndexMacro 0, rcx, 3                                ; Compute offset of this row
+                add rax, [pKernel]
+                movups xmm0, [rax]                                  ; Load kernel values
+
+
+                ; Prepare channels
+                mov rcx, [iNeighbourhoodIterator]                   ; Compute row index of the neighbours
+                add rcx, [iIteratorY]
+                mov rdx, [iIteratorX]
+                sub rdx, 1
+                IndexMacro rdx, rcx, [imgWidth]                     ; Compute offset of this row
+                mov [iOffset], rax                                  ; Save it for now
+
+                mov rbx, [pInChannelR]
+                add rbx, [iOffset]                                  ; Address of the first top row neighbour (channel R)
+                movups xmm1, [rbx]                                  ; Load R channel values
+
+                mov rbx, [pInChannelG]
+                add rbx, [iOffset]                                  ; Address of the first top row neighbour (channel G)
+                movups xmm2, [rbx]                                  ; Load G channel values
+
+                mov rbx, [pInChannelB]
+                add rbx, [iOffset]                                  ; Address of the first top row neighbour (channel B)
+                movups xmm3, [rbx]                                  ; Load B channel values
+
+
+                ; Apply kernel
+                mulps xmm1, xmm0
+                mulps xmm2, xmm0
+                mulps xmm3, xmm0
+
+                
+                ; Update new value of R
+                addss xmm5, xmm1                                    ; Add 1st cell
+                shufps xmm1, xmm1, 11100101b                        ; Move to 2nd cell
+                addss xmm5, xmm1                                    ; Add 2nd cell
+                shufps xmm1, xmm1, 11100110b                        ; Move to 3rd cell
+                addss xmm5, xmm1                                    ; Add 3rd cell
+                
+                ; Update new value of G
+                addss xmm6, xmm2                                    ; Add 1st cell
+                shufps xmm2, xmm2, 11100101b                        ; Move to 2nd cell
+                addss xmm6, xmm2                                    ; Add 2nd cell
+                shufps xmm2, xmm2, 11100110b                        ; Move to 3rd cell
+                addss xmm6, xmm2                                    ; Add 3rd cell
+                
+                ; Update new value of B
+                addss xmm7, xmm3                                    ; Add 1st cell
+                shufps xmm3, xmm3, 11100101b                        ; Move to 2nd cell
+                addss xmm7, xmm3                                    ; Add 2nd cell
+                shufps xmm3, xmm3, 11100110b                        ; Move to 3rd cell
+                addss xmm7, xmm3                                    ; Add 3rd cell
+
+
+
+                ; Increments iterator of LoopNeigbours and checks the LoopNeigbours condition
+                inc [iNeighbourhoodIterator]
+                xor rax, rax
+                mov eax, 2
+                cmp rax, [iNeighbourhoodIterator]
+                jne LoopNeigbours_body
+
+
+
+
+            movups REAL4 PTR [r11], xmm5                                        ; Rewrite R value from input to the output
             add r8, r14                                                         ; Input channel R
             add r11, r14                                                        ; Output channel R
 
-            
-            IndexMacro [iIteratorX], [iIteratorY], [imgWidth]
-            add rax, [pInChannelG]                                              ; Obtain address of channel G value
-            mov ebx, REAL4 PTR [rax]
-            mov REAL4 PTR [r12], ebx                                            ; Rewrite G value from input to the output
-            
+            movups REAL4 PTR [r12], xmm6                                        ; Rewrite G value from input to the output
             add r9, r14                                                         ; Input channel G
             add r12, r14                                                        ; Output channel G
 
-            
-            IndexMacro [iIteratorX], [iIteratorY], [imgWidth]                   
-            add rax, [pInChannelB]                                              ; Obtain address of channel B value
-            mov ebx, REAL4 PTR [rax]
-            mov REAL4 PTR [r13], ebx                                            ; Rewrite B value from input to the output
-            
+            movups REAL4 PTR [r13], xmm7                                        ; Rewrite B value from input to the output
             add r10, r14                                                        ; Input channel B
             add r13, r14                                                        ; Output channel B
 
 
             ; Increments iterator of LoopCenterX and checks the LoopCenterX condition
             inc [iIteratorX]
-            xor rax, rax
-            mov eax, [imgWidth]
+            mov rax, [imgWidth]
             add rax, -1
             cmp rax, [iIteratorX]
             jne LoopCenterX_body
@@ -216,8 +283,7 @@ UnsharpMasking  PROC
 
         ; Increments iterator of LoopCenterY and checks the LoopCenterY condition
         inc [iIteratorY]
-        xor rax, rax
-        mov eax, [imgHeight]
+        mov rax, [imgHeight]
         add rax, -1
         cmp rax, [iIteratorY]
         jne LoopCenterY_body
@@ -234,8 +300,7 @@ UnsharpMasking  PROC
         
         ; After each loop iteration
         inc [iIteratorX]                    ; Increment loop counter
-        xor rax, rax
-        mov eax, [imgWidth]                 ; Prepare condition
+        mov rax, [imgWidth]                 ; Prepare condition
         cmp rax, [iIteratorX]               ; Check loop condition
         jne BottomBorderLoop_body           ; Repeat loop until condition is met
 
@@ -283,6 +348,43 @@ RewritePixelFromInputToOutput  PROC
 
 RewritePixelFromInputToOutput ENDP
 
+
+
+TestFunc  PROC
+.data
+    factor REAL4 4.0
+
+.code
+
+    mov r9, rcx
+    mov r10, rdx
+
+
+    movss xmm1, [factor]
+    shufps xmm1, xmm1, 00000000b
+    
+
+    mov rax, 3
+    IndexMacro 0, 0, rax
+    add rax, r9
+    movups xmm0, [rax]                                  ; Load kernel values
+
+    mulps xmm0, xmm1
+
+    xorps xmm5, xmm5
+    shufps xmm0, xmm0, 11100101b                        ; Omit the 0th cell
+    addss xmm5, xmm0                                    ; Add 1st cell
+    shufps xmm0, xmm0, 11100110b                        ; Move to 2nd cell
+    addss xmm5, xmm0                                    ; Add 2nd cell
+    shufps xmm0, xmm0, 11100111b                        ; Move to 3rd cell
+    addss xmm5, xmm0                                    ; Add 3rd cell
+
+    movups [r10], xmm5                                  ; Load kernel values
+
+
+    RET
+
+TestFunc ENDP
 
 _TEXT  ENDS
 

@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
 using System.Runtime.InteropServices;
+using static System.Windows.Forms.ListBox;
 
 namespace APL_Final_Project.TestWindow
 {
@@ -20,7 +21,7 @@ namespace APL_Final_Project.TestWindow
         private IDictionary<int, ICollection<double>> measurementsCpp;
         private IDictionary<int, ICollection<double>> measurementsCppOptimized;
 
-        public PerformanceTestWindow()
+        public PerformanceTestWindow(ObjectCollection lstFiles)
         {
             InitializeComponent();
 
@@ -29,10 +30,7 @@ namespace APL_Final_Project.TestWindow
             measurementsCppOptimized = new Dictionary<int, ICollection<double>>();
 
             lstTestFiles.Items.Clear();
-            lstTestFiles.Items.Add("audi.png");
-            lstTestFiles.Items.Add("2021-10-22-07PM-59-16_cb8df913-aa0a-4bcd-999c-24b0259ef41b.jpg");
-            lstTestFiles.Items.Add("istockphoto-1289383957-170667a.jpg");
-            lstTestFiles.Items.Add("pexels-valdemaras-d-1647962.bmp");
+            lstTestFiles.Items.AddRange(lstFiles);
         }
 
         private void btnAddFile_Click(object sender, EventArgs e)
@@ -48,11 +46,12 @@ namespace APL_Final_Project.TestWindow
         private async void btnExecuteTests_Click(object sender, EventArgs e)
         {
             var cpu = new ManagementObjectSearcher("select * from Win32_Processor").Get().Cast<ManagementObject>().First();
+            this.chartData.Titles.Clear();
             this.chartData.Titles.Add("Performance test on " + (string)cpu["Name"]);
 
             decimal[] kernel = { 
                 0, 0, 0, 
-                0, 0, 1, 
+                0, 1, 0, 
                 0, 0, 0 
             };
 
@@ -64,7 +63,7 @@ namespace APL_Final_Project.TestWindow
                 {
                     var resultAsm = await USM.UnsharpMaskingAsm(new Bitmap(image), kernel);
                     var resultCpp = await USM.UnsharpMaskingCpp(new Bitmap(image), kernel);
-                    var resultCppOptimized = await USM.UnsharpMaskingCppV2(new Bitmap(image), kernel);
+                    //var resultCppOptimized = await USM.UnsharpMaskingCppV2(new Bitmap(image), kernel);
 
                     if (measurementsAsm.ContainsKey(image.Width * image.Height))
                         measurementsAsm[image.Width * image.Height].Add(resultAsm.ExecutionTime.TotalMilliseconds);
@@ -72,16 +71,16 @@ namespace APL_Final_Project.TestWindow
                         measurementsAsm.Add(image.Width * image.Height, new List<double>() { resultAsm.ExecutionTime.TotalMilliseconds });
 
                     if (measurementsCpp.ContainsKey(image.Width * image.Height))
-                        measurementsCpp[image.Width * image.Height].Add(resultAsm.ExecutionTime.TotalMilliseconds);
+                        measurementsCpp[image.Width * image.Height].Add(resultCpp.ExecutionTime.TotalMilliseconds);
                     else
                         measurementsCpp.Add(image.Width * image.Height, new List<double>() { resultCpp.ExecutionTime.TotalMilliseconds });
 
-                    if (measurementsCppOptimized.ContainsKey(image.Width * image.Height))
-                        measurementsCppOptimized[image.Width * image.Height].Add(resultCppOptimized.ExecutionTime.TotalMilliseconds);
-                    else
-                        measurementsCppOptimized.Add(image.Width * image.Height, new List<double>() { resultCppOptimized.ExecutionTime.TotalMilliseconds });
+                    //if (measurementsCppOptimized.ContainsKey(image.Width * image.Height))
+                    //    measurementsCppOptimized[image.Width * image.Height].Add(resultCppOptimized.ExecutionTime.TotalMilliseconds);
+                    //else
+                    //    measurementsCppOptimized.Add(image.Width * image.Height, new List<double>() { resultCppOptimized.ExecutionTime.TotalMilliseconds });
 
-                    this.lstData.Items.Add($"Pixels: {image.Width}x{image.Height}={image.Width * image.Height}, Asm: {resultAsm.ExecutionTimeString}, Cpp: {resultCpp.ExecutionTimeString}, Cpp optimized: {resultCppOptimized.ExecutionTimeString}");
+                    //this.lstData.Items.Add($"Pixels: {image.Width}x{image.Height}={image.Width * image.Height}, Asm: {resultAsm.ExecutionTimeString}, Cpp: {resultCpp.ExecutionTimeString}, Cpp optimized: {resultCppOptimized.ExecutionTimeString}");
                 }
             }
 

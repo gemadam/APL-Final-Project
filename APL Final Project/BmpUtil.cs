@@ -45,8 +45,8 @@ namespace APL_Final_Project
             Bitmap bmp = new Bitmap(w, h);
 
             var normalizedArrR = Normalize(arrR, Math.Min(0, arrR.OrderBy(x => x).First(x => !float.IsNaN(x))), Math.Max(1, arrR.OrderByDescending(x => x).First(x => !float.IsNaN(x)))).Select(x => float.IsNaN(x) ? 1 : x).ToArray();
-            var normalizedArrG = Normalize(arrG, Math.Min(0, arrG.Min()), Math.Max(1, arrG.Max())).Select(x => float.IsNaN(x) ? 1 : x).ToArray();
-            var normalizedArrB = Normalize(arrB, Math.Min(0, arrB.Min()), Math.Max(1, arrB.Max())).Select(x => float.IsNaN(x) ? 1 : x).ToArray();
+            var normalizedArrG = Normalize(arrG, Math.Min(0, arrG.OrderBy(x => x).First(x => !float.IsNaN(x))), Math.Max(1, arrG.OrderByDescending(x => x).First(x => !float.IsNaN(x)))).Select(x => float.IsNaN(x) ? 1 : x).ToArray();
+            var normalizedArrB = Normalize(arrB, Math.Min(0, arrB.OrderBy(x => x).First(x => !float.IsNaN(x))), Math.Max(1, arrB.OrderByDescending(x => x).First(x => !float.IsNaN(x)))).Select(x => float.IsNaN(x) ? 1 : x).ToArray();
 
             var iBufferIterator = 0;
             for (var x = 0; x < bmp.Width; x++)

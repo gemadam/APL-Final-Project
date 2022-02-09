@@ -50,8 +50,6 @@ namespace APL_Final_Project
             cbCppV2LiveReload.Checked = false;
             cbSamleLiveReload.Checked = true;
 
-            txtInputFile.Text = "Test2.bmp";
-
             btnKernel1.Text  = " 0  0  0" + Environment.NewLine;
             btnKernel1.Text += " 0  1  0" + Environment.NewLine;
             btnKernel1.Text += " 0  0  0" + Environment.NewLine;
@@ -68,6 +66,7 @@ namespace APL_Final_Project
             btnKernel4.Text += "-1  5  1" + Environment.NewLine;
             btnKernel4.Text += " 0  1  2" + Environment.NewLine;
 
+            listBox1.Items.Add("3x3.bmp");
             listBox1.Items.Add("Borders.png");
             listBox1.Items.Add("BordersVert.png");
             listBox1.Items.Add("BordersHor.png");
@@ -77,6 +76,9 @@ namespace APL_Final_Project
             listBox1.Items.Add("Pattern.jpg");
             listBox1.Items.Add("audi.png");
             listBox1.Items.Add("HD.jpg");
+
+
+            txtInputFile.Text = listBox1.Items[1].ToString();
         }
 
         private void btnOpenInputFileDialog_Click(object sender, EventArgs e)
@@ -245,7 +247,7 @@ namespace APL_Final_Project
 
         private void btnPerformance_Click(object sender, EventArgs e)
         {
-            using (PerformanceTestWindow dialog = new PerformanceTestWindow())
+            using (PerformanceTestWindow dialog = new PerformanceTestWindow(listBox1.Items))
                 dialog.ShowDialog(this);
         }
 
