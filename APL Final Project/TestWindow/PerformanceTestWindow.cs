@@ -12,22 +12,23 @@ using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
 using System.Runtime.InteropServices;
 using static System.Windows.Forms.ListBox;
+using System.Collections.Concurrent;
 
 namespace APL_Final_Project.TestWindow
 {
     public partial class PerformanceTestWindow : Form
     {
-        private IDictionary<int, ICollection<double>> measurementsAsm;
-        private IDictionary<int, ICollection<double>> measurementsCpp;
-        private IDictionary<int, ICollection<double>> measurementsCppOptimized;
+        private IDictionary<int, ConcurrentBag<double>> measurementsAsm;
+        private IDictionary<int, ConcurrentBag<double>> measurementsCpp;
+        private IDictionary<int, ConcurrentBag<double>> measurementsCppOptimized;
 
         public PerformanceTestWindow(ObjectCollection lstFiles)
         {
             InitializeComponent();
 
-            measurementsAsm = new Dictionary<int, ICollection<double>>();
-            measurementsCpp = new Dictionary<int, ICollection<double>>();
-            measurementsCppOptimized = new Dictionary<int, ICollection<double>>();
+            measurementsAsm = new ConcurrentDictionary<int, ConcurrentBag<double>>();
+            measurementsCpp = new ConcurrentDictionary<int, ConcurrentBag<double>>();
+            measurementsCppOptimized = new ConcurrentDictionary<int, ConcurrentBag<double>>();
 
             lstTestFiles.Items.Clear();
             lstTestFiles.Items.AddRange(lstFiles);
@@ -43,7 +44,7 @@ namespace APL_Final_Project.TestWindow
                 this.lstTestFiles.Items.Add(this.openFileDialog1.SafeFileName);
         }
 
-        private async void btnExecuteTests_Click(object sender, EventArgs e)
+        private void btnExecuteTests_Click(object sender, EventArgs e)
         {
             var cpu = new ManagementObjectSearcher("select * from Win32_Processor").Get().Cast<ManagementObject>().First();
             this.chartData.Titles.Clear();
@@ -56,31 +57,47 @@ namespace APL_Final_Project.TestWindow
             };
 
 
-            this.lstData.Items.Clear();
             foreach (var testFile in lstTestFiles.Items)
             {
                 using (var image = Image.FromFile(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), testFile.ToString())))
                 {
-                    var resultAsm = await USM.UnsharpMaskingAsm(new Bitmap(image), kernel);
-                    var resultCpp = await USM.UnsharpMaskingCpp(new Bitmap(image), kernel);
-                    //var resultCppOptimized = await USM.UnsharpMaskingCppV2(new Bitmap(image), kernel);
+                    USMResult? asm = null;
+                    USMResult? cpp = null;
 
-                    if (measurementsAsm.ContainsKey(image.Width * image.Height))
-                        measurementsAsm[image.Width * image.Height].Add(resultAsm.ExecutionTime.TotalMilliseconds);
-                    else
-                        measurementsAsm.Add(image.Width * image.Height, new List<double>() { resultAsm.ExecutionTime.TotalMilliseconds });
+                    var taskAsm = USM.UnsharpMaskingAsm(new Bitmap(image), kernel).ContinueWith(x =>
+                    {
+                        asm = x.Result;
 
-                    if (measurementsCpp.ContainsKey(image.Width * image.Height))
-                        measurementsCpp[image.Width * image.Height].Add(resultCpp.ExecutionTime.TotalMilliseconds);
-                    else
-                        measurementsCpp.Add(image.Width * image.Height, new List<double>() { resultCpp.ExecutionTime.TotalMilliseconds });
+                        if (measurementsAsm.ContainsKey(image.Width * image.Height))
+                            measurementsAsm[image.Width * image.Height].Add(x.Result.ExecutionTime.TotalMilliseconds);
+                        else
+                            measurementsAsm.Add(image.Width * image.Height, new ConcurrentBag<double>() { x.Result.ExecutionTime.TotalMilliseconds });
+                    });
 
-                    //if (measurementsCppOptimized.ContainsKey(image.Width * image.Height))
-                    //    measurementsCppOptimized[image.Width * image.Height].Add(resultCppOptimized.ExecutionTime.TotalMilliseconds);
-                    //else
-                    //    measurementsCppOptimized.Add(image.Width * image.Height, new List<double>() { resultCppOptimized.ExecutionTime.TotalMilliseconds });
+                    var taskCpp = USM.UnsharpMaskingCpp(new Bitmap(image), kernel).ContinueWith(x =>
+                    {
+                        cpp = x.Result;
 
-                    //this.lstData.Items.Add($"Pixels: {image.Width}x{image.Height}={image.Width * image.Height}, Asm: {resultAsm.ExecutionTimeString}, Cpp: {resultCpp.ExecutionTimeString}, Cpp optimized: {resultCppOptimized.ExecutionTimeString}");
+                        if (measurementsCpp.ContainsKey(image.Width * image.Height))
+                            measurementsCpp[image.Width * image.Height].Add(x.Result.ExecutionTime.TotalMilliseconds);
+                        else
+                            measurementsCpp.Add(image.Width * image.Height, new ConcurrentBag<double>() { x.Result.ExecutionTime.TotalMilliseconds });
+                    });
+
+                    var taskCppOp = USM.UnsharpMaskingCppV2(new Bitmap(image), kernel).ContinueWith(x =>
+                    {
+                        cpp = x.Result;
+
+                        if (measurementsCppOptimized.ContainsKey(image.Width * image.Height))
+                            measurementsCppOptimized[image.Width * image.Height].Add(x.Result.ExecutionTime.TotalMilliseconds);
+                        else
+                            measurementsCppOptimized.Add(image.Width * image.Height, new ConcurrentBag<double>() { x.Result.ExecutionTime.TotalMilliseconds });
+                    });
+
+
+                    taskAsm.Wait();
+                    taskCpp.Wait();
+                    taskCppOp.Wait();
                 }
             }
 

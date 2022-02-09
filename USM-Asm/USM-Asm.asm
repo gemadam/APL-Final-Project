@@ -2,26 +2,6 @@ PUBLIC  UnsharpMasking
 
 _TEXT  SEGMENT
 
-; =======================================================================================
-;  Macro computes address of the value in 2D array
-;   _x - X index
-;   _y - Y index
-;   _w - Width of the array
-;  Offset is returned in rax
-; =======================================================================================
-IndexMacro MACRO _x, _y, _w
-
-    ; Convert index to offset
-    xor rax, rax
-    mov rax, _y             ; How many rows to skip
-    mov rbx, _w
-    mul rbx                 ; How many values to skip vertically
-    add rax, _x             ; How many values to skip horizontally
-    mov rbx, 4              ; REAL4 size
-    mul rbx                 ; Multiply by REAL4 size
-
-ENDM
-
 
 ; =======================================================================================
 ;  Macro reads the input data structure
@@ -38,37 +18,37 @@ ENDM
 ; =======================================================================================
 ProcessInputStructureMacro MACRO _pInputStruct, _imgWidth, _imgHeight, _pKernel, _pInChannelR, _pInChannelG, _pInChannelB, _pOutChannelR, _pOutChannelG, _pOutChannelB
 
-    mov rax, rcx                           ; 1st argument of the function is a pointer to the input structure
-    mov _pInputStruct, rax                 ; Save the pointer to the input structure
+    mov rax, rcx                        ; 1st argument is a pointer to structure
+    mov _pInputStruct, rax              ; Save the pointer to the input structure
 
     xor rbx, rbx
-    mov ebx, [rax]                         ; Obtain the value of the 1st structure member
-    mov QWORD PTR _imgWidth, rbx           ; Save the value in imgWidth variable
+    mov ebx, [rax]                      ; Obtain the value of the 1st structure member
+    mov QWORD PTR _imgWidth, rbx        ; Save the value in imgWidth variable
     
     xor rbx, rbx
-    mov ebx, [rax + 4]                     ; Move to the 2nd element of the structure
-    mov QWORD PTR _imgHeight, rbx          ; Save the value in imgHeight variable
+    mov ebx, [rax + 4]                  ; Move to the 2nd element of the structure
+    mov QWORD PTR _imgHeight, rbx       ; Save the value in imgHeight variable
 
-    mov rbx, [rax + 8]                     ; Move to the 3rd element of the structure
-    mov QWORD PTR _pKernel, rbx            ; Save this pointer as pKernel
+    mov rbx, [rax + 8]                  ; Move to the 3rd element of the structure
+    mov QWORD PTR _pKernel, rbx         ; Save this pointer as pKernel
 
-    mov rbx, [rax + 16]                    ; Move to the 4th element of the structure
-    mov QWORD PTR _pInChannelR, rbx        ; Save this pointer as pInChannelR
+    mov rbx, [rax + 16]                 ; Move to the 4th element of the structure
+    mov QWORD PTR _pInChannelR, rbx     ; Save this pointer as pInChannelR
 
-    mov rbx, [rax + 24]                    ; Move to the 5th element of the structure
-    mov QWORD PTR _pInChannelG, rbx        ; Save this pointer as pInChannelG
+    mov rbx, [rax + 24]                 ; Move to the 5th element of the structure
+    mov QWORD PTR _pInChannelG, rbx     ; Save this pointer as pInChannelG
 
-    mov rbx, [rax + 32]                    ; Move to the 5th element of the structure
-    mov QWORD PTR _pInChannelB, rbx        ; Save this pointer as pInChannelB
+    mov rbx, [rax + 32]                 ; Move to the 5th element of the structure
+    mov QWORD PTR _pInChannelB, rbx     ; Save this pointer as pInChannelB
 
-    mov rbx, [rax + 40]                    ; Move to the 6th element of the structure
-    mov QWORD PTR _pOutChannelR, rbx       ; Save this pointer as pOutChannelR
+    mov rbx, [rax + 40]                 ; Move to the 6th element of the structure
+    mov QWORD PTR _pOutChannelR, rbx    ; Save this pointer as pOutChannelR
 
-    mov rbx, [rax + 48]                    ; Move to the 7th element of the structure
-    mov QWORD PTR _pOutChannelG, rbx       ; Save this pointer as pOutChannelG
+    mov rbx, [rax + 48]                 ; Move to the 7th element of the structure
+    mov QWORD PTR _pOutChannelG, rbx    ; Save this pointer as pOutChannelG
 
-    mov rbx, [rax + 56]                    ; Move to the 8th element of the structure
-    mov QWORD PTR _pOutChannelB, rbx       ; Save this pointer as pOutChannelB
+    mov rbx, [rax + 56]                 ; Move to the 8th element of the structure
+    mov QWORD PTR _pOutChannelB, rbx    ; Save this pointer as pOutChannelB
 
 ENDM
 
@@ -79,29 +59,25 @@ ENDM
 UnsharpMasking  PROC
 .data
     ; Local variables
-    iOffset             QWORD       0
-    pixelDataTypeSize   QWORD       4
-    initNewPixelVal     REAL4       0.0
+    iOffset                 QWORD       0
+    initNewPixelVal         REAL4       0.0
 
     ; Loop iteretors
-    iIteratorX                   QWORD       0
-    iIteratorY                   QWORD       0
-    iNeighbourhoodIterator       QWORD       0
-
-    ; Auxiliary pointers
-    pNeigbour           QWORD       0
+    iIteratorX              QWORD       0
+    iIteratorY              QWORD       0
+    iNeighbourhoodIterator  QWORD       0
 
     ; Input structure pointers
-    pInputStruct        QWORD       0
-    imgWidth            QWORD       0
-    imgHeight           QWORD       0
-    pKernel             QWORD       0
-    pInChannelR         QWORD       0
-    pInChannelG         QWORD       0
-    pInChannelB         QWORD       0
-    pOutChannelR        QWORD       0
-    pOutChannelG        QWORD       0
-    pOutChannelB        QWORD       0
+    pInputStruct            QWORD       0
+    imgWidth                QWORD       0
+    imgHeight               QWORD       0
+    pKernel                 QWORD       0
+    pInChannelR             QWORD       0
+    pInChannelG             QWORD       0
+    pInChannelB             QWORD       0
+    pOutChannelR            QWORD       0
+    pOutChannelG            QWORD       0
+    pOutChannelB            QWORD       0
 
 .code
 
@@ -136,7 +112,7 @@ UnsharpMasking  PROC
 
     ; Register r14 will be used for storing pixel address increment
     xor r14, r14                            ; Make sure r14 is clean
-    mov r14, [pixelDataTypeSize]
+    mov r14, 4
 
     ; Register r15 will be used for storing kernel address
     xor r15, r15                            ; Make sure r15 is clean
@@ -189,19 +165,25 @@ UnsharpMasking  PROC
 
 
                 ; Prepare kernel
-                mov rcx, [iNeighbourhoodIterator]                   ; Compute row index of the neighbours
-                add rcx, 1
-                IndexMacro 0, rcx, 3                                ; Compute offset of this row
-                add rax, [pKernel]
+                mov rax, [iNeighbourhoodIterator]                   ; Compute kernel offset
+                add rax, 1                                          ; How many rows to skip
+                mov rbx, 3                                          ; Wdith of the kernel
+                mul rbx                                             ; How many values to skip vertically
+                mov rbx, 4                                          ; REAL4 size
+                mul rbx                                             ; Multiply by REAL4 size
+                add rax, [pKernel]                                  ; Add kernel address to the offset
                 movups xmm0, [rax]                                  ; Load kernel values
 
 
                 ; Prepare channels
-                mov rcx, [iNeighbourhoodIterator]                   ; Compute row index of the neighbours
-                add rcx, [iIteratorY]
-                mov rdx, [iIteratorX]
-                sub rdx, 1
-                IndexMacro rdx, rcx, [imgWidth]                     ; Compute offset of this row
+                mov rax, [iNeighbourhoodIterator]                   ; Compute row index of the neighbours
+                mov rax, [iIteratorY]                               ; How many rows to skip
+                mov rbx, [imgWidth]
+                mul rbx                                             ; How many values to skip vertically
+                add rax, [iIteratorX]                               ; How many values to skip horizontally
+                sub rax, 1
+                mov rbx, 4                                          ; REAL4 size
+                mul rbx                                             ; Multiply by REAL4 size
                 mov [iOffset], rax                                  ; Save it for now
 
                 mov rbx, [pInChannelR]
@@ -256,17 +238,17 @@ UnsharpMasking  PROC
 
 
 
-            movups REAL4 PTR [r11], xmm5                                        ; Rewrite R value from input to the output
-            add r8, r14                                                         ; Input channel R
-            add r11, r14                                                        ; Output channel R
+            movups REAL4 PTR [r11], xmm5            ; Write R value to the output
+            add r8, r14                             ; Input channel R
+            add r11, r14                            ; Output channel R
 
-            movups REAL4 PTR [r12], xmm6                                        ; Rewrite G value from input to the output
-            add r9, r14                                                         ; Input channel G
-            add r12, r14                                                        ; Output channel G
+            movups REAL4 PTR [r12], xmm6            ; Write G value to the output
+            add r9, r14                             ; Input channel G
+            add r12, r14                            ; Output channel G
 
-            movups REAL4 PTR [r13], xmm7                                        ; Rewrite B value from input to the output
-            add r10, r14                                                        ; Input channel B
-            add r13, r14                                                        ; Output channel B
+            movups REAL4 PTR [r13], xmm7            ; Write B value to the output
+            add r10, r14                            ; Input channel B
+            add r13, r14                            ; Output channel B
 
 
             ; Increments iterator of LoopCenterX and checks the LoopCenterX condition
@@ -313,7 +295,7 @@ UnsharpMasking ENDP
 
 
 ; =======================================================================================
-;  Funtion rewrites pixel channels from input to output and moves addresses by one pixel
+;  Function writes channels of the pixel from input to output and moves addresses by one pixel
 ;   r8  - Address of input R channel
 ;   r9  - Address of input G channel
 ;   r10 - Address of input B channel
@@ -327,14 +309,14 @@ RewritePixelFromInputToOutput  PROC
 .code
 
     ; Rewrite input to output
-    mov eax, REAL4 PTR [r8]             ; Change address of input R channel to value under it
-    mov REAL4 PTR [r11], eax            ; Rewrite R value from input to the output
+    mov eax, REAL4 PTR [r8]         ; Get value under channel R address
+    mov REAL4 PTR [r11], eax        ; Write that value to the output
 
-    mov eax, REAL4 PTR [r9]             ; Change address of input G channel to value under it
-    mov REAL4 PTR [r12], eax            ; Rewrite G value from input to the output
+    mov eax, REAL4 PTR [r9]         ; Get value under channel G address
+    mov REAL4 PTR [r12], eax        ; Write that value to the output
 
-    mov eax, REAL4 PTR [r10]            ; Change address of input B channel to value under it
-    mov REAL4 PTR [r13], eax            ; Rewrite B value from input to the output
+    mov eax, REAL4 PTR [r10]        ; Get value under channel B address
+    mov REAL4 PTR [r13], eax        ; Write that value to the output
 
     ; Move addresses by one pixel
     add r8, r14                         ; Input channel R
@@ -347,44 +329,6 @@ RewritePixelFromInputToOutput  PROC
     ret
 
 RewritePixelFromInputToOutput ENDP
-
-
-
-TestFunc  PROC
-.data
-    factor REAL4 4.0
-
-.code
-
-    mov r9, rcx
-    mov r10, rdx
-
-
-    movss xmm1, [factor]
-    shufps xmm1, xmm1, 00000000b
-    
-
-    mov rax, 3
-    IndexMacro 0, 0, rax
-    add rax, r9
-    movups xmm0, [rax]                                  ; Load kernel values
-
-    mulps xmm0, xmm1
-
-    xorps xmm5, xmm5
-    shufps xmm0, xmm0, 11100101b                        ; Omit the 0th cell
-    addss xmm5, xmm0                                    ; Add 1st cell
-    shufps xmm0, xmm0, 11100110b                        ; Move to 2nd cell
-    addss xmm5, xmm0                                    ; Add 2nd cell
-    shufps xmm0, xmm0, 11100111b                        ; Move to 3rd cell
-    addss xmm5, xmm0                                    ; Add 3rd cell
-
-    movups [r10], xmm5                                  ; Load kernel values
-
-
-    RET
-
-TestFunc ENDP
 
 _TEXT  ENDS
 

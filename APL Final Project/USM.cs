@@ -101,18 +101,6 @@ namespace APL_Final_Project
 
         public static unsafe Task<USMResult> UnsharpMaskingAsm(Bitmap imgInput, decimal[] kernel)
         {
-            var input = kernel.Select(x => (float)Convert.ToDouble(x)).ToArray();
-            var output = new float[9];
-
-            fixed(float* pIn = input, pOut = output)
-            {
-                TestFunc(pIn, pOut);
-
-
-                var x = pOut[3];
-                x = 0;
-            }
-
             return Task.Run(() => makeTest(imgInput, kernel, usmAsm));
         }
 
@@ -129,9 +117,6 @@ namespace APL_Final_Project
 
         [DllImport("USM-Asm.dll", CallingConvention = CallingConvention.StdCall, EntryPoint = "UnsharpMasking")]
         public static unsafe extern void usmAsm(USMFunctionInput input);
-
-        [DllImport("USM-Asm.dll", CallingConvention = CallingConvention.StdCall, EntryPoint = "TestFunc")]
-        public static unsafe extern void TestFunc(float* input, float* output);
 
         #endregion
     }

@@ -1,4 +1,3 @@
 LIBRARY USM-Asm
 
 EXPORTS UnsharpMasking
-EXPORTS TestFunc

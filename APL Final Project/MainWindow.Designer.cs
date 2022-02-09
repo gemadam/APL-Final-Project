@@ -69,7 +69,7 @@ namespace APL_Final_Project
             this.btnKernel4 = new System.Windows.Forms.Button();
             this.picDiff = new System.Windows.Forms.PictureBox();
             this.button1 = new System.Windows.Forms.Button();
-            this.listBox1 = new System.Windows.Forms.ListBox();
+            this.lstboxSampleFiles = new System.Windows.Forms.ListBox();
             ((System.ComponentModel.ISupportInitialize)(this.picSample)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.picCpp)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.picAsm)).BeginInit();
@@ -560,23 +560,24 @@ namespace APL_Final_Project
             this.button1.TabIndex = 56;
             this.button1.Text = "Make diff";
             this.button1.UseVisualStyleBackColor = true;
+            this.button1.Visible = false;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
-            // listBox1
+            // lstboxSampleFiles
             // 
-            this.listBox1.FormattingEnabled = true;
-            this.listBox1.Location = new System.Drawing.Point(12, 51);
-            this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(398, 82);
-            this.listBox1.TabIndex = 57;
-            this.listBox1.SelectedIndexChanged += new System.EventHandler(this.listBox1_SelectedIndexChanged);
+            this.lstboxSampleFiles.FormattingEnabled = true;
+            this.lstboxSampleFiles.Location = new System.Drawing.Point(12, 51);
+            this.lstboxSampleFiles.Name = "lstboxSampleFiles";
+            this.lstboxSampleFiles.Size = new System.Drawing.Size(398, 82);
+            this.lstboxSampleFiles.TabIndex = 57;
+            this.lstboxSampleFiles.SelectedIndexChanged += new System.EventHandler(this.listBox1_SelectedIndexChanged);
             // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1216, 709);
-            this.Controls.Add(this.listBox1);
+            this.Controls.Add(this.lstboxSampleFiles);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.picDiff);
             this.Controls.Add(this.btnKernel4);
@@ -679,7 +680,7 @@ namespace APL_Final_Project
         private System.Windows.Forms.Button btnKernel4;
         private System.Windows.Forms.PictureBox picDiff;
         private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.ListBox listBox1;
+        private System.Windows.Forms.ListBox lstboxSampleFiles;
     }
 }
 

@@ -49,7 +49,7 @@ extern "C" __declspec(dllexport) void UnsharpMaskingCpp(CppBMP &input)
 		// Center of the image
 		for (int x = 1; x < input.width - 1; x++)
 		{
-			auto newPixelValue = new float[3] { 0, 0, 0 };
+			auto newPixelValue = new float[3] { 0.0, 0.0, 0.0 };
 
 			// Process the neigbourhood of the pixel
 			for (auto a = 0; a < 3; a++)
