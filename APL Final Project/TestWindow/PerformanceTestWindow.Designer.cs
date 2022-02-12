@@ -35,6 +35,7 @@
             this.btnExecuteTests = new System.Windows.Forms.Button();
             this.chartData = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
+            this.txtCsvData = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.chartData)).BeginInit();
             this.SuspendLayout();
             // 
@@ -87,7 +88,7 @@
             this.chartData.Legends.Add(legend1);
             this.chartData.Location = new System.Drawing.Point(262, 12);
             this.chartData.Name = "chartData";
-            this.chartData.Size = new System.Drawing.Size(868, 463);
+            this.chartData.Size = new System.Drawing.Size(868, 350);
             this.chartData.TabIndex = 4;
             this.chartData.Text = "chart1";
             // 
@@ -95,11 +96,20 @@
             // 
             this.openFileDialog1.FileName = "openFileDialog";
             // 
+            // txtCsvData
+            // 
+            this.txtCsvData.Location = new System.Drawing.Point(263, 369);
+            this.txtCsvData.Multiline = true;
+            this.txtCsvData.Name = "txtCsvData";
+            this.txtCsvData.Size = new System.Drawing.Size(867, 106);
+            this.txtCsvData.TabIndex = 5;
+            // 
             // PerformanceTestWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1142, 524);
+            this.Controls.Add(this.txtCsvData);
             this.Controls.Add(this.chartData);
             this.Controls.Add(this.btnExecuteTests);
             this.Controls.Add(this.btnAddFile);
@@ -108,6 +118,7 @@
             this.Text = "Performance tests";
             ((System.ComponentModel.ISupportInitialize)(this.chartData)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -118,5 +129,6 @@
         private System.Windows.Forms.Button btnExecuteTests;
         private System.Windows.Forms.DataVisualization.Charting.Chart chartData;
         private System.Windows.Forms.OpenFileDialog openFileDialog1;
+        private System.Windows.Forms.TextBox txtCsvData;
     }
 }

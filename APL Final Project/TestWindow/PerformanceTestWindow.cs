@@ -50,6 +50,8 @@ namespace APL_Final_Project.TestWindow
             this.chartData.Titles.Clear();
             this.chartData.Titles.Add("Performance test on " + (string)cpu["Name"]);
 
+            txtCsvData.Text = "Performance test on " + (string)cpu["Name"] + Environment.NewLine;
+
             decimal[] kernel = { 
                 0, 0, 0, 
                 0, 1, 0, 
@@ -117,6 +119,22 @@ namespace APL_Final_Project.TestWindow
             seriesCppOptimized.ChartType = SeriesChartType.Spline;
             foreach (var measurementSet in measurementsCppOptimized.OrderBy(x => x.Key))
                 seriesCppOptimized.Points.AddXY($"{measurementSet.Key}", measurementSet.Value.Average());
+
+
+            txtCsvData.Text += "NumberOfPixels;Asm;Cpp;CppOptimized" + Environment.NewLine;
+            foreach (var measurementSet in measurementsAsm.OrderBy(x => x.Key))
+            {
+                var asm = measurementSet.Value;
+                var cpp = measurementsCpp[measurementSet.Key];
+                var cppV2 = measurementsCppOptimized[measurementSet.Key];
+
+
+                if(asm != null && cpp != null && cppV2 != null)
+                {
+                    txtCsvData.Text += $"{measurementSet.Key};{asm.Average()};{cpp.Average()};{cppV2.Average()}" + Environment.NewLine;
+                }
+            }
+
         }
     }
 }
