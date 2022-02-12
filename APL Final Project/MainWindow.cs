@@ -66,17 +66,17 @@ namespace APL_Final_Project
             btnKernel4.Text += "-1  5  1" + Environment.NewLine;
             btnKernel4.Text += " 0  1  2" + Environment.NewLine;
 
-            lstboxSampleFiles.Items.Add("3x3.bmp");
-            lstboxSampleFiles.Items.Add("Borders.png");
-            lstboxSampleFiles.Items.Add("BordersVert.png");
-            lstboxSampleFiles.Items.Add("BordersHor.png");
-            lstboxSampleFiles.Items.Add("Corners.bmp");
-            lstboxSampleFiles.Items.Add("Multicolor.png");
-            lstboxSampleFiles.Items.Add("Squares.jpg");
-            lstboxSampleFiles.Items.Add("Pattern.jpg");
-            lstboxSampleFiles.Items.Add("audi.png");
-            lstboxSampleFiles.Items.Add("HD.jpg");
-            lstboxSampleFiles.Items.Add("5464x3643.jpg");
+            lstboxSampleFiles.Items.Add("./3x3.bmp");
+            lstboxSampleFiles.Items.Add("./Borders.png");
+            lstboxSampleFiles.Items.Add("./BordersVert.png");
+            lstboxSampleFiles.Items.Add("./BordersHor.png");
+            lstboxSampleFiles.Items.Add("./Corners.bmp");
+            lstboxSampleFiles.Items.Add("./Multicolor.png");
+            lstboxSampleFiles.Items.Add("./Squares.jpg");
+            lstboxSampleFiles.Items.Add("./Pattern.jpg");
+            lstboxSampleFiles.Items.Add("./audi.png");
+            lstboxSampleFiles.Items.Add("./HD.jpg");
+            lstboxSampleFiles.Items.Add("./5464x3643.jpg");
 
 
             txtInputFile.Text = lstboxSampleFiles.Items[1].ToString();
@@ -116,10 +116,10 @@ namespace APL_Final_Project
         {
             this.fileDialog.Title = "Please select the file";
             this.fileDialog.Multiselect = false;
-            this.fileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
+            this.fileDialog.InitialDirectory = ".";
 
             if (this.fileDialog.ShowDialog() == DialogResult.OK)
-                txtBox.Text = this.fileDialog.SafeFileName;
+                txtBox.Text = this.fileDialog.FileName;
         }
 
         private async Task btnUSMClick(Button btnUSM, Label lbResult, PictureBox picBox, CheckBox cbReload, Func<Bitmap, decimal[], Task<USMResult>> fUSM)
@@ -131,7 +131,7 @@ namespace APL_Final_Project
 
             lbResult.Text = "Executing...";
 
-            var img = Image.FromFile(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), txtInputFile.Text));
+            var img = Image.FromFile(txtInputFile.Text);
             var result = await fUSM.Invoke(new Bitmap(img), kernel);
 
             picBox.Image = ResizeImage((Bitmap)result.Image, picBox.Width, picBox.Height);
@@ -192,7 +192,7 @@ namespace APL_Final_Project
                 return;
             }
 
-            var img = Image.FromFile(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), txtInputFile.Text));
+            var img = Image.FromFile(txtInputFile.Text);
            
             picSample.Image = ResizeImage((Bitmap)img, picSample.Width, picSample.Height);
 
@@ -240,7 +240,7 @@ namespace APL_Final_Project
         {
             lbBestTimeCppV2.Text = "Executing...";
 
-            var img = Image.FromFile(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), txtInputFile.Text));
+            var img = Image.FromFile(txtInputFile.Text);
             var result = await USM.UnsharpMaskingCppV2(new Bitmap(img), kernel);
             lbBestTimeCppV2.Text = result.ExecutionTimeString;
             picCppV2.Image = ResizeImage((Bitmap)result.Image, picCppV2.Width, picCppV2.Height);
