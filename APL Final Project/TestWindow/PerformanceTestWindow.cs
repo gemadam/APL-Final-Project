@@ -61,7 +61,7 @@ namespace APL_Final_Project.TestWindow
 
             foreach (var testFile in lstTestFiles.Items)
             {
-                using (var image = Image.FromFile(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), testFile.ToString())))
+                using (var image = Image.FromFile(testFile.ToString()))
                 {
                     USMResult? asm = null;
                     USMResult? cpp = null;
